@@ -3,37 +3,610 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hola Mundo</title>
+    <title>Actividades de Alistamiento Bogotá</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            text-align: center;
+            font-size: 2.2em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .excel-container {
+            overflow-x: auto;
+            overflow-y: auto;
+            margin-top: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            max-height: 600px;
+            position: relative;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            font-size: 14px;
+            min-width: 800px;
+        }
+
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: 600;
+            padding: 15px;
+            text-align: left;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e0e0e0;
+            color: #555;
+            white-space: nowrap;
+        }
+
+        tr:hover {
+            background-color: #f8f9ff;
+            transition: background-color 0.3s ease;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            font-size: 1.2em;
+            color: #666;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            margin-top: 20px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            text-align: center;
+            padding: 50px;
+            color: #e74c3c;
+            font-size: 1.2em;
+            background: #fdf0ed;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .success-message {
+            text-align: center;
+            padding: 20px;
+            color: #27ae60;
+            background: #e8f8f5;
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+
+        .stats {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9ff;
+            border-radius: 10px;
+            color: #667eea;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .search-box {
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 20px;
+            font-size: 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            transition: border-color 0.3s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .export-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+
+        .export-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .sheet-selector {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .sheet-selector label {
+            font-weight: 600;
+            color: #555;
+        }
+
+        .sheet-select {
+            padding: 8px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #333;
+            background: white;
+            cursor: pointer;
+            flex: 1;
+            max-width: 300px;
+        }
+
+        .sheet-select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .file-info {
+            display: inline-block;
+            padding: 5px 10px;
+            background: #e8f4fd;
+            border-radius: 5px;
+            color: #3498db;
+            font-size: 12px;
+        }
+
+        .pagination {
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f0f0f0;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
         }
-        
-        .container {
-            text-align: center;
-            padding: 2rem;
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+
+        .page-btn {
+            padding: 8px 16px;
+            border: 1px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
         }
-        
-        h1 {
-            color: #333;
-            font-size: 3rem;
-            margin: 0;
+
+        .page-btn:hover:not(:disabled) {
+            background: #667eea;
+            color: white;
+        }
+
+        .page-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .rows-per-page {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #666;
+        }
+
+        .rows-select {
+            padding: 5px;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
         }
     </style>
+    <!-- Librería SheetJS para leer Excel directamente -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
     <div class="container">
-        <h1>¡Hola Mundo!</h1>
-        <p>Bienvenido a mi sitio web</p>
+        <h1>📊 Actividades de Alistamiento Bogotá</h1>
+        <div class="subtitle">
+            Visualización directa del archivo Excel: <strong>ActividadesAlistamientoBogota.xlsx</strong>
+            <span class="file-info" id="fileInfo">Cargando...</span>
+        </div>
+        
+        <div class="sheet-selector">
+            <label for="sheetSelect">Hoja del Excel:</label>
+            <select id="sheetSelect" class="sheet-select" onchange="changeSheet()">
+                <option value="">Seleccione una hoja...</option>
+            </select>
+        </div>
+        
+        <div class="search-box">
+            <input type="text" class="search-input" id="searchInput" placeholder="Buscar en todas las columnas...">
+        </div>
+        
+        <div id="excelContent">
+            <div class="loading">
+                <div>Cargando archivo Excel directamente...</div>
+                <div class="spinner"></div>
+            </div>
+        </div>
+        
+        <div class="stats" id="stats" style="display: none;">
+            <div>
+                <span id="rowCount"></span>
+                <span style="margin-left: 15px;" id="sheetInfo"></span>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <div class="rows-per-page">
+                    <span>Filas por página:</span>
+                    <select id="rowsPerPage" class="rows-select" onchange="changeRowsPerPage()">
+                        <option value="10">10</option>
+                        <option value="20" selected>20</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                        <option value="all">Todas</option>
+                    </select>
+                </div>
+                <button class="export-btn" onclick="exportToCSV()">📥 Exportar a CSV</button>
+            </div>
+        </div>
+        
+        <div class="pagination" id="pagination"></div>
     </div>
+
+    <script>
+        let workbook = null;
+        let allData = [];
+        let headers = [];
+        let currentPage = 1;
+        let rowsPerPage = 20;
+        let filteredData = [];
+        let currentSheet = 'Hoja1';
+
+        // Cargar el archivo Excel directamente
+        async function loadExcel() {
+            try {
+                const response = await fetch('ActividadesAlistamientoBogota.xlsx');
+                if (!response.ok) {
+                    throw new Error('No se pudo encontrar el archivo ActividadesAlistamientoBogota.xlsx');
+                }
+                
+                const arrayBuffer = await response.arrayBuffer();
+                const data = new Uint8Array(arrayBuffer);
+                
+                // Leer el workbook completo
+                workbook = XLSX.read(data, {type: 'array'});
+                
+                // Actualizar selector de hojas
+                const sheetSelect = document.getElementById('sheetSelect');
+                sheetSelect.innerHTML = '<option value="">Seleccione una hoja...</option>';
+                
+                workbook.SheetNames.forEach(sheetName => {
+                    const option = document.createElement('option');
+                    option.value = sheetName;
+                    option.textContent = sheetName;
+                    if (sheetName === 'Hoja1') {
+                        option.selected = true;
+                    }
+                    sheetSelect.appendChild(option);
+                });
+                
+                // Cargar la primera hoja por defecto
+                loadSheet('Hoja1');
+                
+                document.getElementById('fileInfo').textContent = `✓ Archivo cargado: ${workbook.SheetNames.length} hoja(s) disponible(s)`;
+                
+            } catch (error) {
+                console.error('Error:', error);
+                showError('Error al cargar el archivo Excel. Asegúrate de que el archivo "ActividadesAlistamientoBogota.xlsx" existe en la raíz del repositorio.');
+                document.getElementById('fileInfo').textContent = '✗ Error al cargar';
+            }
+        }
+
+        function loadSheet(sheetName) {
+            if (!workbook) return;
+            
+            try {
+                const worksheet = workbook.Sheets[sheetName];
+                if (!worksheet) {
+                    showError(`No se encontró la hoja "${sheetName}"`);
+                    return;
+                }
+                
+                // Convertir la hoja a JSON (array de arrays)
+                const jsonData = XLSX.utils.sheet_to_json(worksheet, { 
+                    header: 1,
+                    defval: '', // Valor por defecto para celdas vacías
+                    blankrows: false // Ignorar filas completamente vacías
+                });
+                
+                if (jsonData.length > 0) {
+                    // La primera fila son los encabezados
+                    headers = jsonData[0] || [];
+                    // El resto son los datos
+                    allData = jsonData.slice(1).filter(row => row.some(cell => cell !== '' && cell !== null && cell !== undefined));
+                    
+                    filteredData = [...allData];
+                    currentPage = 1;
+                    
+                    displayData();
+                    updateStats();
+                    
+                    // Mostrar mensaje de éxito
+                    document.getElementById('sheetInfo').textContent = `Hoja: ${sheetName} | Columnas: ${headers.length}`;
+                } else {
+                    showError(`La hoja "${sheetName}" está vacía`);
+                }
+                
+            } catch (error) {
+                console.error('Error al cargar hoja:', error);
+                showError(`Error al procesar la hoja "${sheetName}"`);
+            }
+        }
+
+        function changeSheet() {
+            const sheetSelect = document.getElementById('sheetSelect');
+            const selectedSheet = sheetSelect.value;
+            
+            if (selectedSheet) {
+                currentSheet = selectedSheet;
+                loadSheet(selectedSheet);
+            }
+        }
+
+        function displayData() {
+            const container = document.getElementById('excelContent');
+            
+            if (!filteredData || filteredData.length === 0) {
+                container.innerHTML = '<div class="error">No se encontraron datos en esta hoja</div>';
+                document.getElementById('stats').style.display = 'none';
+                document.getElementById('pagination').innerHTML = '';
+                return;
+            }
+            
+            // Calcular paginación
+            const rowsPerPageValue = document.getElementById('rowsPerPage').value;
+            const rowsPerPage = rowsPerPageValue === 'all' ? filteredData.length : parseInt(rowsPerPageValue);
+            
+            const startIndex = (currentPage - 1) * rowsPerPage;
+            const endIndex = Math.min(startIndex + rowsPerPage, filteredData.length);
+            const pageData = filteredData.slice(startIndex, endIndex);
+            
+            // Crear tabla
+            let tableHTML = '<div class="excel-container"><table><thead><tr>';
+            
+            // Encabezados
+            if (headers.length > 0) {
+                headers.forEach(header => {
+                    const headerText = header && header.toString().trim() !== '' ? header : 'Columna';
+                    tableHTML += `<th>${headerText}</th>`;
+                });
+            } else {
+                // Si no hay encabezados, crear encabezados genéricos
+                const maxCols = Math.max(...pageData.map(row => row.length), 0);
+                for (let i = 0; i < maxCols; i++) {
+                    tableHTML += `<th>Columna ${i + 1}</th>`;
+                }
+            }
+            tableHTML += '</tr></thead><tbody>';
+            
+            // Datos
+            pageData.forEach(row => {
+                tableHTML += '<tr>';
+                // Asegurar que todas las filas tengan el mismo número de columnas
+                const rowData = [...row];
+                while (rowData.length < headers.length) {
+                    rowData.push('');
+                }
+                
+                rowData.forEach(cell => {
+                    const value = cell !== undefined && cell !== null ? cell : '';
+                    // Formatear fechas si es necesario
+                    let displayValue = value;
+                    if (value instanceof Date) {
+                        displayValue = value.toLocaleDateString();
+                    }
+                    tableHTML += `<td>${displayValue}</td>`;
+                });
+                tableHTML += '</tr>';
+            });
+            
+            tableHTML += '</tbody></table></div>';
+            
+            container.innerHTML = tableHTML;
+            
+            // Mostrar estadísticas
+            document.getElementById('stats').style.display = 'flex';
+            
+            // Actualizar paginación
+            updatePagination(rowsPerPage);
+        }
+
+        function updatePagination(rowsPerPage) {
+            const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+            const paginationDiv = document.getElementById('pagination');
+            
+            if (totalPages <= 1) {
+                paginationDiv.innerHTML = '';
+                return;
+            }
+            
+            let paginationHTML = '';
+            
+            // Botón anterior
+            paginationHTML += `<button class="page-btn" onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>Anterior</button>`;
+            
+            // Números de página
+            const maxButtons = 5;
+            let startPage = Math.max(1, currentPage - Math.floor(maxButtons / 2));
+            let endPage = Math.min(totalPages, startPage + maxButtons - 1);
+            
+            if (endPage - startPage + 1 < maxButtons) {
+                startPage = Math.max(1, endPage - maxButtons + 1);
+            }
+            
+            if (startPage > 1) {
+                paginationHTML += `<button class="page-btn" onclick="changePage(1)">1</button>`;
+                if (startPage > 2) {
+                    paginationHTML += `<span class="page-btn" style="border: none;">...</span>`;
+                }
+            }
+            
+            for (let i = startPage; i <= endPage; i++) {
+                paginationHTML += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">${i}</button>`;
+            }
+            
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) {
+                    paginationHTML += `<span class="page-btn" style="border: none;">...</span>`;
+                }
+                paginationHTML += `<button class="page-btn" onclick="changePage(${totalPages})">${totalPages}</button>`;
+            }
+            
+            // Botón siguiente
+            paginationHTML += `<button class="page-btn" onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>Siguiente</button>`;
+            
+            paginationDiv.innerHTML = paginationHTML;
+        }
+
+        function changePage(page) {
+            currentPage = page;
+            displayData();
+        }
+
+        function changeRowsPerPage() {
+            currentPage = 1;
+            displayData();
+        }
+
+        function updateStats() {
+            document.getElementById('rowCount').textContent = `Mostrando ${filteredData.length} de ${allData.length} registros`;
+        }
+
+        function showError(message) {
+            const container = document.getElementById('excelContent');
+            container.innerHTML = `<div class="error">${message}</div>`;
+            document.getElementById('stats').style.display = 'none';
+            document.getElementById('pagination').innerHTML = '';
+        }
+
+        // Función de búsqueda
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase().trim();
+            
+            if (searchTerm === '') {
+                filteredData = [...allData];
+            } else {
+                filteredData = allData.filter(row => {
+                    return row.some(cell => {
+                        if (cell === null || cell === undefined) return false;
+                        return cell.toString().toLowerCase().includes(searchTerm);
+                    });
+                });
+            }
+            
+            currentPage = 1;
+            displayData();
+            updateStats();
+        });
+
+        // Función para exportar a CSV
+        function exportToCSV() {
+            const dataToExport = filteredData;
+            const csvContent = [
+                headers.map(h => {
+                    const headerStr = (h || '').toString();
+                    if (headerStr.includes(',') || headerStr.includes('"') || headerStr.includes('\n')) {
+                        return `"${headerStr.replace(/"/g, '""')}"`;
+                    }
+                    return headerStr;
+                }).join(','),
+                ...dataToExport.map(row => 
+                    row.map(cell => {
+                        if (cell === null || cell === undefined) return '';
+                        const cellStr = cell.toString();
+                        if (cellStr.includes(',') || cellStr.includes('"') || cellStr.includes('\n')) {
+                            return `"${cellStr.replace(/"/g, '""')}"`;
+                        }
+                        return cellStr;
+                    }).join(',')
+                )
+            ].join('\n');
+            
+            const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.href = url;
+            link.setAttribute('download', `ActividadesAlistamientoBogota_${currentSheet}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
+        // Iniciar carga cuando la página esté lista
+        window.addEventListener('load', loadExcel);
+    </script>
 </body>
 </html>
