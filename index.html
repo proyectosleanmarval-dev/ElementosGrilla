@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Actividades de Alistamiento Bogotá</title>
+    <title>Actividades de Grilla para Alistamiento - Sucursal Bogotá</title>
     <style>
         * {
             margin: 0;
@@ -12,42 +12,163 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f7fa;
             min-height: 100vh;
-            padding: 20px;
+            padding: 30px;
         }
 
         .container {
             max-width: 1400px;
             margin: 0 auto;
             background: white;
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            border-radius: 8px;
+            padding: 35px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
         }
 
         h1 {
-            color: #333;
-            margin-bottom: 10px;
-            text-align: center;
-            font-size: 2.2em;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-size: 28px;
+            font-weight: 500;
+            letter-spacing: -0.3px;
+            border-bottom: 2px solid #eef2f7;
+            padding-bottom: 20px;
         }
 
         .subtitle {
-            text-align: center;
-            color: #666;
+            color: #5d6d7e;
             margin-bottom: 30px;
-            font-size: 1.1em;
+            font-size: 15px;
+            font-weight: 400;
+        }
+
+        .filters-section {
+            background: #f8fafd;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 1px solid #e9ecf0;
+        }
+
+        .filters-title {
+            color: #2c3e50;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-group label {
+            color: #4a5568;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .filter-select {
+            padding: 12px 15px;
+            border: 1px solid #dce4ec;
+            border-radius: 6px;
+            font-size: 14px;
+            color: #2c3e50;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .filter-select:hover {
+            border-color: #a0b8cc;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52,152,219,0.1);
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: #2c3e50;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1e2b37;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #2c3e50;
+            border: 1px solid #dce4ec;
+        }
+
+        .btn-secondary:hover {
+            background: #f8fafd;
+            border-color: #a0b8cc;
+        }
+
+        .search-box {
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 14px 20px;
+            font-size: 14px;
+            border: 1px solid #dce4ec;
+            border-radius: 6px;
+            transition: border-color 0.2s;
+            font-family: inherit;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52,152,219,0.1);
         }
 
         .excel-container {
             overflow-x: auto;
             overflow-y: auto;
             margin-top: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            max-height: 600px;
+            border-radius: 8px;
+            border: 1px solid #e9ecf0;
+            max-height: 550px;
             position: relative;
         }
 
@@ -55,52 +176,52 @@
             width: 100%;
             border-collapse: collapse;
             background: white;
-            font-size: 14px;
-            min-width: 800px;
+            font-size: 13px;
+            min-width: 1000px;
         }
 
         th {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #2c3e50;
             color: white;
-            font-weight: 600;
-            padding: 15px;
+            font-weight: 500;
+            padding: 16px 15px;
             text-align: left;
             position: sticky;
             top: 0;
             z-index: 10;
             white-space: nowrap;
+            font-size: 13px;
+            letter-spacing: 0.3px;
         }
 
         td {
             padding: 12px 15px;
-            border-bottom: 1px solid #e0e0e0;
-            color: #555;
+            border-bottom: 1px solid #eef2f7;
+            color: #3a4a5a;
             white-space: nowrap;
         }
 
         tr:hover {
-            background-color: #f8f9ff;
-            transition: background-color 0.3s ease;
+            background-color: #f8fafd;
         }
 
         tr:nth-child(even) {
-            background-color: #f9f9f9;
+            background-color: #fcfdff;
         }
 
         .loading {
             text-align: center;
-            padding: 50px;
-            font-size: 1.2em;
-            color: #666;
+            padding: 60px;
+            color: #5d6d7e;
         }
 
         .spinner {
             display: inline-block;
-            width: 40px;
-            height: 40px;
+            width: 35px;
+            height: 35px;
             margin-top: 20px;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #667eea;
+            border: 3px solid #eef2f7;
+            border-top: 3px solid #2c3e50;
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
@@ -112,137 +233,108 @@
 
         .error {
             text-align: center;
-            padding: 50px;
-            color: #e74c3c;
-            font-size: 1.2em;
-            background: #fdf0ed;
-            border-radius: 10px;
+            padding: 60px;
+            color: #c0392b;
+            background: #fdf3f2;
+            border-radius: 8px;
             margin: 20px 0;
-        }
-
-        .success-message {
-            text-align: center;
-            padding: 20px;
-            color: #27ae60;
-            background: #e8f8f5;
-            border-radius: 10px;
-            margin: 10px 0;
         }
 
         .stats {
             margin-top: 20px;
-            padding: 15px;
-            background: #f8f9ff;
-            border-radius: 10px;
-            color: #667eea;
-            font-weight: 600;
+            padding: 15px 20px;
+            background: #f8fafd;
+            border-radius: 8px;
+            color: #2c3e50;
+            font-size: 14px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 15px;
+            border: 1px solid #e9ecf0;
         }
 
-        .search-box {
-            margin-bottom: 20px;
-        }
-
-        .search-input {
-            width: 100%;
-            padding: 12px 20px;
-            font-size: 16px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            transition: border-color 0.3s;
-        }
-
-        .search-input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .export-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            transition: transform 0.2s;
-        }
-
-        .export-btn:hover {
-            transform: translateY(-2px);
-        }
-
-        .sheet-selector {
-            margin-bottom: 20px;
+        .stats-left {
             display: flex;
-            gap: 10px;
+            gap: 20px;
             align-items: center;
             flex-wrap: wrap;
         }
 
-        .sheet-selector label {
+        .stat-item {
+            color: #5d6d7e;
+        }
+
+        .stat-value {
             font-weight: 600;
-            color: #555;
+            color: #2c3e50;
+            margin-left: 5px;
         }
 
-        .sheet-select {
-            padding: 8px 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 14px;
-            color: #333;
-            background: white;
+        .export-section {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .export-btn {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 6px;
             cursor: pointer;
-            flex: 1;
-            max-width: 300px;
+            font-size: 13px;
+            font-weight: 500;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .sheet-select:focus {
-            outline: none;
-            border-color: #667eea;
+        .export-btn:hover {
+            background: #219a52;
         }
 
-        .file-info {
-            display: inline-block;
-            padding: 5px 10px;
-            background: #e8f4fd;
-            border-radius: 5px;
-            color: #3498db;
+        .export-info {
             font-size: 12px;
+            color: #7f8c8d;
+            background: #ecf0f1;
+            padding: 4px 10px;
+            border-radius: 4px;
         }
 
         .pagination {
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 10px;
-            margin-top: 20px;
+            gap: 8px;
+            margin-top: 25px;
             flex-wrap: wrap;
         }
 
         .page-btn {
-            padding: 8px 16px;
-            border: 1px solid #667eea;
+            padding: 8px 14px;
+            border: 1px solid #dce4ec;
             background: white;
-            color: #667eea;
-            border-radius: 5px;
+            color: #2c3e50;
+            border-radius: 6px;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.2s;
+            font-size: 13px;
+            min-width: 38px;
         }
 
         .page-btn:hover:not(:disabled) {
-            background: #667eea;
-            color: white;
+            background: #f8fafd;
+            border-color: #a0b8cc;
         }
 
         .page-btn.active {
-            background: #667eea;
+            background: #2c3e50;
             color: white;
+            border-color: #2c3e50;
         }
 
         .page-btn:disabled {
@@ -254,50 +346,98 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            color: #666;
+            color: #5d6d7e;
+            font-size: 13px;
         }
 
         .rows-select {
-            padding: 5px;
-            border: 1px solid #e0e0e0;
-            border-radius: 5px;
+            padding: 6px 10px;
+            border: 1px solid #dce4ec;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #2c3e50;
+            background: white;
+            cursor: pointer;
+        }
+
+        .file-info {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #eef2f7;
+            border-radius: 20px;
+            color: #2c3e50;
+            font-size: 12px;
         }
     </style>
-    <!-- Librería SheetJS para leer Excel directamente -->
+    <!-- Librerías necesarias -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
 </head>
 <body>
     <div class="container">
-        <h1>📊 Actividades de Alistamiento Bogotá</h1>
+        <h1>Actividades de grilla para alistamiento, Sucursal Bogotá</h1>
         <div class="subtitle">
-            Visualización directa del archivo Excel: <strong>ActividadesAlistamientoBogota.xlsx</strong>
-            <span class="file-info" id="fileInfo">Cargando...</span>
+            Visualización de datos - Hoja1
+            <span class="file-info" id="fileInfo">Cargando archivo...</span>
         </div>
         
-        <div class="sheet-selector">
-            <label for="sheetSelect">Hoja del Excel:</label>
-            <select id="sheetSelect" class="sheet-select" onchange="changeSheet()">
-                <option value="">Seleccione una hoja...</option>
-            </select>
+        <!-- Filtros específicos -->
+        <div class="filters-section">
+            <div class="filters-title">Filtros de búsqueda</div>
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label for="filterProyecto">PROYECTO</label>
+                    <select id="filterProyecto" class="filter-select">
+                        <option value="">Todos los proyectos</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="filterActividad">ACTIVIDAD ALISTAMIENTO</label>
+                    <select id="filterActividad" class="filter-select">
+                        <option value="">Todas las actividades</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="filterComponente">COMPONENTE</label>
+                    <select id="filterComponente" class="filter-select">
+                        <option value="">Todos los componentes</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="filter-actions">
+                <button class="btn btn-secondary" onclick="clearFilters()">Limpiar filtros</button>
+                <button class="btn btn-primary" onclick="applyFilters()">Aplicar filtros</button>
+            </div>
         </div>
         
+        <!-- Búsqueda global -->
         <div class="search-box">
-            <input type="text" class="search-input" id="searchInput" placeholder="Buscar en todas las columnas...">
+            <input type="text" class="search-input" id="searchInput" placeholder="Búsqueda general en todos los campos...">
         </div>
         
         <div id="excelContent">
             <div class="loading">
-                <div>Cargando archivo Excel directamente...</div>
+                <div>Cargando archivo Excel...</div>
                 <div class="spinner"></div>
             </div>
         </div>
         
         <div class="stats" id="stats" style="display: none;">
-            <div>
-                <span id="rowCount"></span>
-                <span style="margin-left: 15px;" id="sheetInfo"></span>
+            <div class="stats-left">
+                <div class="stat-item">Registros: <span class="stat-value" id="rowCount"></span></div>
+                <div class="stat-item">Columnas: <span class="stat-value" id="columnCount"></span></div>
+                <div class="stat-item">Filtros: <span class="stat-value" id="filterStatus">Sin filtros</span></div>
             </div>
-            <div style="display: flex; gap: 10px; align-items: center;">
+            <div class="export-section">
+                <div class="export-info" id="exportInfo">
+                    <span id="exportCount"></span>
+                </div>
+                <button class="export-btn" onclick="exportToExcel()">
+                    <span>📊</span> Exportar a Excel
+                </button>
                 <div class="rows-per-page">
                     <span>Filas por página:</span>
                     <select id="rowsPerPage" class="rows-select" onchange="changeRowsPerPage()">
@@ -308,7 +448,6 @@
                         <option value="all">Todas</option>
                     </select>
                 </div>
-                <button class="export-btn" onclick="exportToCSV()">📥 Exportar a CSV</button>
             </div>
         </div>
         
@@ -322,7 +461,13 @@
         let currentPage = 1;
         let rowsPerPage = 20;
         let filteredData = [];
-        let currentSheet = 'Hoja1';
+        
+        // Mapeo de índices de columnas (se actualizarán cuando se carguen los datos)
+        let columnIndices = {
+            proyecto: -1,
+            actividad: -1,
+            componente: -1
+        };
 
         // Cargar el archivo Excel directamente
         async function loadExcel() {
@@ -338,22 +483,13 @@
                 // Leer el workbook completo
                 workbook = XLSX.read(data, {type: 'array'});
                 
-                // Actualizar selector de hojas
-                const sheetSelect = document.getElementById('sheetSelect');
-                sheetSelect.innerHTML = '<option value="">Seleccione una hoja...</option>';
-                
-                workbook.SheetNames.forEach(sheetName => {
-                    const option = document.createElement('option');
-                    option.value = sheetName;
-                    option.textContent = sheetName;
-                    if (sheetName === 'Hoja1') {
-                        option.selected = true;
-                    }
-                    sheetSelect.appendChild(option);
-                });
-                
-                // Cargar la primera hoja por defecto
-                loadSheet('Hoja1');
+                // Cargar solo la Hoja1
+                if (workbook.SheetNames.includes('Hoja1')) {
+                    loadSheet('Hoja1');
+                } else {
+                    // Si no existe Hoja1, cargar la primera hoja disponible
+                    loadSheet(workbook.SheetNames[0]);
+                }
                 
                 document.getElementById('fileInfo').textContent = `✓ Archivo cargado: ${workbook.SheetNames.length} hoja(s) disponible(s)`;
                 
@@ -377,24 +513,35 @@
                 // Convertir la hoja a JSON (array de arrays)
                 const jsonData = XLSX.utils.sheet_to_json(worksheet, { 
                     header: 1,
-                    defval: '', // Valor por defecto para celdas vacías
-                    blankrows: false // Ignorar filas completamente vacías
+                    defval: '',
+                    blankrows: false
                 });
                 
                 if (jsonData.length > 0) {
-                    // La primera fila son los encabezados
                     headers = jsonData[0] || [];
-                    // El resto son los datos
                     allData = jsonData.slice(1).filter(row => row.some(cell => cell !== '' && cell !== null && cell !== undefined));
                     
-                    filteredData = [...allData];
-                    currentPage = 1;
+                    // Identificar índices de las columnas que nos interesan
+                    headers.forEach((header, index) => {
+                        const headerStr = (header || '').toString().toUpperCase().trim();
+                        if (headerStr.includes('PROYECTO')) {
+                            columnIndices.proyecto = index;
+                        } else if (headerStr.includes('ACTIVIDAD') && headerStr.includes('ALISTAMIENTO')) {
+                            columnIndices.actividad = index;
+                        } else if (headerStr.includes('COMPONENTE')) {
+                            columnIndices.componente = index;
+                        }
+                    });
                     
+                    filteredData = [...allData];
+                    
+                    // Poblar los filtros desplegables
+                    populateFilters();
+                    
+                    currentPage = 1;
                     displayData();
                     updateStats();
                     
-                    // Mostrar mensaje de éxito
-                    document.getElementById('sheetInfo').textContent = `Hoja: ${sheetName} | Columnas: ${headers.length}`;
                 } else {
                     showError(`La hoja "${sheetName}" está vacía`);
                 }
@@ -405,21 +552,116 @@
             }
         }
 
-        function changeSheet() {
-            const sheetSelect = document.getElementById('sheetSelect');
-            const selectedSheet = sheetSelect.value;
+        function populateFilters() {
+            // Obtener valores únicos para cada filtro
+            const proyectos = new Set();
+            const actividades = new Set();
+            const componentes = new Set();
             
-            if (selectedSheet) {
-                currentSheet = selectedSheet;
-                loadSheet(selectedSheet);
-            }
+            allData.forEach(row => {
+                if (columnIndices.proyecto !== -1 && row[columnIndices.proyecto]) {
+                    proyectos.add(row[columnIndices.proyecto].toString().trim());
+                }
+                if (columnIndices.actividad !== -1 && row[columnIndices.actividad]) {
+                    actividades.add(row[columnIndices.actividad].toString().trim());
+                }
+                if (columnIndices.componente !== -1 && row[columnIndices.componente]) {
+                    componentes.add(row[columnIndices.componente].toString().trim());
+                }
+            });
+            
+            // Ordenar alfabéticamente
+            const sortedProyectos = Array.from(proyectos).sort();
+            const sortedActividades = Array.from(actividades).sort();
+            const sortedComponentes = Array.from(componentes).sort();
+            
+            // Poblar select de Proyectos
+            const selectProyecto = document.getElementById('filterProyecto');
+            selectProyecto.innerHTML = '<option value="">Todos los proyectos</option>';
+            sortedProyectos.forEach(value => {
+                const option = document.createElement('option');
+                option.value = value;
+                option.textContent = value;
+                selectProyecto.appendChild(option);
+            });
+            
+            // Poblar select de Actividades
+            const selectActividad = document.getElementById('filterActividad');
+            selectActividad.innerHTML = '<option value="">Todas las actividades</option>';
+            sortedActividades.forEach(value => {
+                const option = document.createElement('option');
+                option.value = value;
+                option.textContent = value;
+                selectActividad.appendChild(option);
+            });
+            
+            // Poblar select de Componentes
+            const selectComponente = document.getElementById('filterComponente');
+            selectComponente.innerHTML = '<option value="">Todos los componentes</option>';
+            sortedComponentes.forEach(value => {
+                const option = document.createElement('option');
+                option.value = value;
+                option.textContent = value;
+                selectComponente.appendChild(option);
+            });
+        }
+
+        function applyFilters() {
+            const proyectoFilter = document.getElementById('filterProyecto').value;
+            const actividadFilter = document.getElementById('filterActividad').value;
+            const componenteFilter = document.getElementById('filterComponente').value;
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+            
+            filteredData = allData.filter(row => {
+                // Aplicar filtros específicos
+                if (proyectoFilter && columnIndices.proyecto !== -1) {
+                    const rowValue = row[columnIndices.proyecto] ? row[columnIndices.proyecto].toString() : '';
+                    if (rowValue !== proyectoFilter) return false;
+                }
+                
+                if (actividadFilter && columnIndices.actividad !== -1) {
+                    const rowValue = row[columnIndices.actividad] ? row[columnIndices.actividad].toString() : '';
+                    if (rowValue !== actividadFilter) return false;
+                }
+                
+                if (componenteFilter && columnIndices.componente !== -1) {
+                    const rowValue = row[columnIndices.componente] ? row[columnIndices.componente].toString() : '';
+                    if (rowValue !== componenteFilter) return false;
+                }
+                
+                // Aplicar búsqueda general
+                if (searchTerm) {
+                    return row.some(cell => {
+                        if (cell === null || cell === undefined) return false;
+                        return cell.toString().toLowerCase().includes(searchTerm);
+                    });
+                }
+                
+                return true;
+            });
+            
+            currentPage = 1;
+            displayData();
+            updateStats();
+        }
+
+        function clearFilters() {
+            document.getElementById('filterProyecto').value = '';
+            document.getElementById('filterActividad').value = '';
+            document.getElementById('filterComponente').value = '';
+            document.getElementById('searchInput').value = '';
+            
+            filteredData = [...allData];
+            currentPage = 1;
+            displayData();
+            updateStats();
         }
 
         function displayData() {
             const container = document.getElementById('excelContent');
             
             if (!filteredData || filteredData.length === 0) {
-                container.innerHTML = '<div class="error">No se encontraron datos en esta hoja</div>';
+                container.innerHTML = '<div class="error">No se encontraron datos con los filtros aplicados</div>';
                 document.getElementById('stats').style.display = 'none';
                 document.getElementById('pagination').innerHTML = '';
                 return;
@@ -437,18 +679,10 @@
             let tableHTML = '<div class="excel-container"><table><thead><tr>';
             
             // Encabezados
-            if (headers.length > 0) {
-                headers.forEach(header => {
-                    const headerText = header && header.toString().trim() !== '' ? header : 'Columna';
-                    tableHTML += `<th>${headerText}</th>`;
-                });
-            } else {
-                // Si no hay encabezados, crear encabezados genéricos
-                const maxCols = Math.max(...pageData.map(row => row.length), 0);
-                for (let i = 0; i < maxCols; i++) {
-                    tableHTML += `<th>Columna ${i + 1}</th>`;
-                }
-            }
+            headers.forEach(header => {
+                const headerText = header && header.toString().trim() !== '' ? header : 'Columna';
+                tableHTML += `<th>${headerText}</th>`;
+            });
             tableHTML += '</tr></thead><tbody>';
             
             // Datos
@@ -462,12 +696,7 @@
                 
                 rowData.forEach(cell => {
                     const value = cell !== undefined && cell !== null ? cell : '';
-                    // Formatear fechas si es necesario
-                    let displayValue = value;
-                    if (value instanceof Date) {
-                        displayValue = value.toLocaleDateString();
-                    }
-                    tableHTML += `<td>${displayValue}</td>`;
+                    tableHTML += `<td>${value}</td>`;
                 });
                 tableHTML += '</tr>';
             });
@@ -509,7 +738,7 @@
             if (startPage > 1) {
                 paginationHTML += `<button class="page-btn" onclick="changePage(1)">1</button>`;
                 if (startPage > 2) {
-                    paginationHTML += `<span class="page-btn" style="border: none;">...</span>`;
+                    paginationHTML += `<span class="page-btn" style="border: none; background: none;">...</span>`;
                 }
             }
             
@@ -519,7 +748,7 @@
             
             if (endPage < totalPages) {
                 if (endPage < totalPages - 1) {
-                    paginationHTML += `<span class="page-btn" style="border: none;">...</span>`;
+                    paginationHTML += `<span class="page-btn" style="border: none; background: none;">...</span>`;
                 }
                 paginationHTML += `<button class="page-btn" onclick="changePage(${totalPages})">${totalPages}</button>`;
             }
@@ -541,7 +770,24 @@
         }
 
         function updateStats() {
-            document.getElementById('rowCount').textContent = `Mostrando ${filteredData.length} de ${allData.length} registros`;
+            document.getElementById('rowCount').textContent = `${filteredData.length} de ${allData.length}`;
+            document.getElementById('columnCount').textContent = headers.length;
+            document.getElementById('exportCount').textContent = `Exportando: ${filteredData.length} registros`;
+            
+            // Actualizar estado de filtros
+            const proyectoFilter = document.getElementById('filterProyecto').value;
+            const actividadFilter = document.getElementById('filterActividad').value;
+            const componenteFilter = document.getElementById('filterComponente').value;
+            const searchTerm = document.getElementById('searchInput').value;
+            
+            const activeFilters = [];
+            if (proyectoFilter) activeFilters.push('Proyecto');
+            if (actividadFilter) activeFilters.push('Actividad');
+            if (componenteFilter) activeFilters.push('Componente');
+            if (searchTerm) activeFilters.push('Búsqueda');
+            
+            document.getElementById('filterStatus').textContent = activeFilters.length > 0 ? 
+                activeFilters.join(', ') : 'Sin filtros';
         }
 
         function showError(message) {
@@ -551,58 +797,71 @@
             document.getElementById('pagination').innerHTML = '';
         }
 
-        // Función de búsqueda
+        // Evento de búsqueda con debounce para mejor rendimiento
+        let searchTimeout;
         document.getElementById('searchInput').addEventListener('input', function(e) {
-            const searchTerm = e.target.value.toLowerCase().trim();
-            
-            if (searchTerm === '') {
-                filteredData = [...allData];
-            } else {
-                filteredData = allData.filter(row => {
-                    return row.some(cell => {
-                        if (cell === null || cell === undefined) return false;
-                        return cell.toString().toLowerCase().includes(searchTerm);
-                    });
-                });
-            }
-            
-            currentPage = 1;
-            displayData();
-            updateStats();
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                applyFilters();
+            }, 300);
         });
 
-        // Función para exportar a CSV
-        function exportToCSV() {
-            const dataToExport = filteredData;
-            const csvContent = [
-                headers.map(h => {
-                    const headerStr = (h || '').toString();
-                    if (headerStr.includes(',') || headerStr.includes('"') || headerStr.includes('\n')) {
-                        return `"${headerStr.replace(/"/g, '""')}"`;
-                    }
-                    return headerStr;
-                }).join(','),
-                ...dataToExport.map(row => 
-                    row.map(cell => {
-                        if (cell === null || cell === undefined) return '';
-                        const cellStr = cell.toString();
-                        if (cellStr.includes(',') || cellStr.includes('"') || cellStr.includes('\n')) {
-                            return `"${cellStr.replace(/"/g, '""')}"`;
-                        }
-                        return cellStr;
-                    }).join(',')
-                )
-            ].join('\n');
+        // Función para exportar a Excel (XLSX) con los datos filtrados
+        function exportToExcel() {
+            if (filteredData.length === 0) {
+                alert('No hay datos para exportar');
+                return;
+            }
             
-            const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            const url = URL.createObjectURL(blob);
-            link.href = url;
-            link.setAttribute('download', `ActividadesAlistamientoBogota_${currentSheet}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
+            try {
+                // Preparar los datos para exportar
+                const exportHeaders = headers.map(h => h || 'Columna');
+                const exportData = [exportHeaders, ...filteredData];
+                
+                // Crear una nueva hoja de trabajo
+                const wb = XLSX.utils.book_new();
+                const ws = XLSX.utils.aoa_to_sheet(exportData);
+                
+                // Ajustar el ancho de las columnas automáticamente
+                const colWidths = [];
+                headers.forEach((header, index) => {
+                    // Calcular el ancho máximo basado en los datos
+                    let maxLength = header ? header.toString().length : 10;
+                    filteredData.forEach(row => {
+                        if (row[index] !== undefined && row[index] !== null) {
+                            maxLength = Math.max(maxLength, row[index].toString().length);
+                        }
+                    });
+                    // Limitar el ancho máximo y mínimo
+                    colWidths.push({ wch: Math.min(Math.max(maxLength, 10), 50) });
+                });
+                ws['!cols'] = colWidths;
+                
+                // Agregar la hoja al libro
+                XLSX.utils.book_append_sheet(wb, ws, 'Hoja1');
+                
+                // Generar nombre del archivo con fecha y filtros
+                const now = new Date();
+                const dateStr = `${now.getFullYear()}${(now.getMonth()+1).toString().padStart(2,'0')}${now.getDate().toString().padStart(2,'0')}_${now.getHours().toString().padStart(2,'0')}${now.getMinutes().toString().padStart(2,'0')}`;
+                
+                // Determinar el tipo de exportación para el nombre
+                let exportType = 'todos';
+                if (filteredData.length < allData.length) {
+                    exportType = 'filtrados';
+                }
+                
+                const fileName = `Actividades_Alistamiento_Bogota_${exportType}_${dateStr}.xlsx`;
+                
+                // Exportar el archivo
+                XLSX.writeFile(wb, fileName);
+                
+                // Mostrar mensaje de éxito
+                alert(`Archivo Excel generado exitosamente con ${filteredData.length} registros`);
+                
+            } catch (error) {
+                console.error('Error al exportar:', error);
+                alert('Error al generar el archivo Excel. Por favor intente nuevamente.');
+            }
         }
 
         // Iniciar carga cuando la página esté lista
