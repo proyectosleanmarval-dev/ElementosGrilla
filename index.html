@@ -94,7 +94,7 @@
             font-family: inherit;
         }
 
-        .filter-select:hover {
+        .filter-select:hover:not(:disabled) {
             border-color: #a0b8cc;
         }
 
@@ -102,6 +102,12 @@
             outline: none;
             border-color: #3498db;
             box-shadow: 0 0 0 3px rgba(52,152,219,0.1);
+        }
+
+        .filter-select:disabled {
+            background-color: #f5f7fa;
+            cursor: not-allowed;
+            opacity: 0.7;
         }
 
         .filter-actions {
@@ -387,14 +393,14 @@
             <div class="filters-grid">
                 <div class="filter-group">
                     <label for="filterProyecto">PROYECTO</label>
-                    <select id="filterProyecto" class="filter-select">
+                    <select id="filterProyecto" class="filter-select" onchange="onProyectoChange()">
                         <option value="">Todos los proyectos</option>
                     </select>
                 </div>
                 
                 <div class="filter-group">
                     <label for="filterActividad">ACTIVIDAD ALISTAMIENTO</label>
-                    <select id="filterActividad" class="filter-select">
+                    <select id="filterActividad" class="filter-select" onchange="onActividadChange()">
                         <option value="">Todas las actividades</option>
                     </select>
                 </div>
@@ -462,7 +468,19 @@
         let rowsPerPage = 20;
         let filteredData = [];
         
-        // Mapeo de índices de columnas (se actualizarán cuando se carguen los datos)
+        // Datos originales para filtros dependientes
+        let uniqueValues = {
+            proyectos: [],
+            actividades: [],
+            componentes: []
+        };
+        
+        // Relaciones para filtros dependientes
+        let proyectoActividades = new Map(); // Proyecto -> Set de actividades
+        let proyectoComponentes = new Map(); // Proyecto -> Set de componentes
+        let actividadComponentes = new Map(); // Actividad -> Set de componentes
+        
+        // Mapeo de índices de columnas
         let columnIndices = {
             proyecto: -1,
             actividad: -1,
@@ -521,7 +539,7 @@
                     headers = jsonData[0] || [];
                     allData = jsonData.slice(1).filter(row => row.some(cell => cell !== '' && cell !== null && cell !== undefined));
                     
-                    // Identificar índices de las columnas que nos interesan
+                    // Identificar índices de las columnas
                     headers.forEach((header, index) => {
                         const headerStr = (header || '').toString().toUpperCase().trim();
                         if (headerStr.includes('PROYECTO')) {
@@ -533,9 +551,12 @@
                         }
                     });
                     
+                    // Construir relaciones para filtros dependientes
+                    buildDependentFilters();
+                    
                     filteredData = [...allData];
                     
-                    // Poblar los filtros desplegables
+                    // Poblar los filtros iniciales
                     populateFilters();
                     
                     currentPage = 1;
@@ -552,58 +573,172 @@
             }
         }
 
-        function populateFilters() {
-            // Obtener valores únicos para cada filtro
-            const proyectos = new Set();
-            const actividades = new Set();
-            const componentes = new Set();
+        function buildDependentFilters() {
+            // Limpiar maps
+            proyectoActividades.clear();
+            proyectoComponentes.clear();
+            actividadComponentes.clear();
+            
+            // Sets para valores únicos
+            const proyectosSet = new Set();
+            const actividadesSet = new Set();
+            const componentesSet = new Set();
             
             allData.forEach(row => {
-                if (columnIndices.proyecto !== -1 && row[columnIndices.proyecto]) {
-                    proyectos.add(row[columnIndices.proyecto].toString().trim());
+                const proyecto = row[columnIndices.proyecto] ? row[columnIndices.proyecto].toString().trim() : '';
+                const actividad = row[columnIndices.actividad] ? row[columnIndices.actividad].toString().trim() : '';
+                const componente = row[columnIndices.componente] ? row[columnIndices.componente].toString().trim() : '';
+                
+                // Agregar a sets de valores únicos
+                if (proyecto) proyectosSet.add(proyecto);
+                if (actividad) actividadesSet.add(actividad);
+                if (componente) componentesSet.add(componente);
+                
+                // Construir relaciones Proyecto -> Actividades
+                if (proyecto && actividad) {
+                    if (!proyectoActividades.has(proyecto)) {
+                        proyectoActividades.set(proyecto, new Set());
+                    }
+                    proyectoActividades.get(proyecto).add(actividad);
                 }
-                if (columnIndices.actividad !== -1 && row[columnIndices.actividad]) {
-                    actividades.add(row[columnIndices.actividad].toString().trim());
+                
+                // Construir relaciones Proyecto -> Componentes
+                if (proyecto && componente) {
+                    if (!proyectoComponentes.has(proyecto)) {
+                        proyectoComponentes.set(proyecto, new Set());
+                    }
+                    proyectoComponentes.get(proyecto).add(componente);
                 }
-                if (columnIndices.componente !== -1 && row[columnIndices.componente]) {
-                    componentes.add(row[columnIndices.componente].toString().trim());
+                
+                // Construir relaciones Actividad -> Componentes
+                if (actividad && componente) {
+                    if (!actividadComponentes.has(actividad)) {
+                        actividadComponentes.set(actividad, new Set());
+                    }
+                    actividadComponentes.get(actividad).add(componente);
                 }
             });
             
-            // Ordenar alfabéticamente
-            const sortedProyectos = Array.from(proyectos).sort();
-            const sortedActividades = Array.from(actividades).sort();
-            const sortedComponentes = Array.from(componentes).sort();
-            
-            // Poblar select de Proyectos
+            // Convertir a arrays ordenados
+            uniqueValues.proyectos = Array.from(proyectosSet).sort();
+            uniqueValues.actividades = Array.from(actividadesSet).sort();
+            uniqueValues.componentes = Array.from(componentesSet).sort();
+        }
+
+        function populateFilters() {
+            // Poblar select de Proyectos (siempre todos)
             const selectProyecto = document.getElementById('filterProyecto');
             selectProyecto.innerHTML = '<option value="">Todos los proyectos</option>';
-            sortedProyectos.forEach(value => {
+            uniqueValues.proyectos.forEach(value => {
                 const option = document.createElement('option');
                 option.value = value;
                 option.textContent = value;
                 selectProyecto.appendChild(option);
             });
             
-            // Poblar select de Actividades
-            const selectActividad = document.getElementById('filterActividad');
-            selectActividad.innerHTML = '<option value="">Todas las actividades</option>';
-            sortedActividades.forEach(value => {
-                const option = document.createElement('option');
-                option.value = value;
-                option.textContent = value;
-                selectActividad.appendChild(option);
-            });
+            // Inicialmente, todos los filtros están habilitados con todas las opciones
+            updateDependentFilters();
+        }
+
+        function updateDependentFilters() {
+            const selectedProyecto = document.getElementById('filterProyecto').value;
+            const selectedActividad = document.getElementById('filterActividad').value;
             
-            // Poblar select de Componentes
+            const selectActividad = document.getElementById('filterActividad');
             const selectComponente = document.getElementById('filterComponente');
+            
+            // Actualizar filtro de Actividades basado en el Proyecto seleccionado
+            if (selectedProyecto) {
+                // Filtrar actividades por proyecto
+                const actividadesDelProyecto = proyectoActividades.get(selectedProyecto) || new Set();
+                const actividadesArray = Array.from(actividadesDelProyecto).sort();
+                
+                selectActividad.innerHTML = '<option value="">Todas las actividades</option>';
+                actividadesArray.forEach(value => {
+                    const option = document.createElement('option');
+                    option.value = value;
+                    option.textContent = value;
+                    if (selectedActividad === value) {
+                        option.selected = true;
+                    }
+                    selectActividad.appendChild(option);
+                });
+                selectActividad.disabled = false;
+            } else {
+                // Si no hay proyecto seleccionado, mostrar todas las actividades
+                selectActividad.innerHTML = '<option value="">Todas las actividades</option>';
+                uniqueValues.actividades.forEach(value => {
+                    const option = document.createElement('option');
+                    option.value = value;
+                    option.textContent = value;
+                    if (selectedActividad === value) {
+                        option.selected = true;
+                    }
+                    selectActividad.appendChild(option);
+                });
+                selectActividad.disabled = false;
+            }
+            
+            // Actualizar filtro de Componentes basado en Proyecto y Actividad
+            updateComponentesFilter(selectedProyecto, selectedActividad);
+        }
+
+        function updateComponentesFilter(proyecto, actividad) {
+            const selectComponente = document.getElementById('filterComponente');
+            const currentComponente = document.getElementById('filterComponente').value;
+            
+            let componentesArray = [];
+            
+            if (actividad) {
+                // Si hay actividad seleccionada, filtrar componentes por actividad
+                const componentesDeActividad = actividadComponentes.get(actividad) || new Set();
+                componentesArray = Array.from(componentesDeActividad).sort();
+            } else if (proyecto) {
+                // Si solo hay proyecto, filtrar componentes por proyecto
+                const componentesDeProyecto = proyectoComponentes.get(proyecto) || new Set();
+                componentesArray = Array.from(componentesDeProyecto).sort();
+            } else {
+                // Si no hay filtros, mostrar todos los componentes
+                componentesArray = uniqueValues.componentes;
+            }
+            
             selectComponente.innerHTML = '<option value="">Todos los componentes</option>';
-            sortedComponentes.forEach(value => {
+            componentesArray.forEach(value => {
                 const option = document.createElement('option');
                 option.value = value;
                 option.textContent = value;
+                if (currentComponente === value) {
+                    option.selected = true;
+                }
                 selectComponente.appendChild(option);
             });
+        }
+
+        function onProyectoChange() {
+            // Cuando cambia el proyecto, resetear actividad y componente si es necesario
+            const selectActividad = document.getElementById('filterActividad');
+            const selectComponente = document.getElementById('filterComponente');
+            
+            // Resetear actividad si el proyecto actual no tiene la actividad seleccionada
+            const selectedProyecto = document.getElementById('filterProyecto').value;
+            const selectedActividad = selectActividad.value;
+            
+            if (selectedProyecto && selectedActividad) {
+                const actividadesDelProyecto = proyectoActividades.get(selectedProyecto) || new Set();
+                if (!actividadesDelProyecto.has(selectedActividad)) {
+                    selectActividad.value = ''; // Resetear actividad si no pertenece al proyecto
+                }
+            }
+            
+            updateDependentFilters();
+        }
+
+        function onActividadChange() {
+            // Cuando cambia la actividad, actualizar componentes
+            const selectedProyecto = document.getElementById('filterProyecto').value;
+            const selectedActividad = document.getElementById('filterActividad').value;
+            
+            updateComponentesFilter(selectedProyecto, selectedActividad);
         }
 
         function applyFilters() {
@@ -647,9 +782,12 @@
 
         function clearFilters() {
             document.getElementById('filterProyecto').value = '';
-            document.getElementById('filterActividad').value = '';
-            document.getElementById('filterComponente').value = '';
+            document.getElementById('filterActividad').innerHTML = '<option value="">Todas las actividades</option>';
+            document.getElementById('filterComponente').innerHTML = '<option value="">Todos los componentes</option>';
             document.getElementById('searchInput').value = '';
+            
+            // Restaurar todos los filtros
+            updateDependentFilters();
             
             filteredData = [...allData];
             currentPage = 1;
@@ -797,7 +935,7 @@
             document.getElementById('pagination').innerHTML = '';
         }
 
-        // Evento de búsqueda con debounce para mejor rendimiento
+        // Evento de búsqueda con debounce
         let searchTimeout;
         document.getElementById('searchInput').addEventListener('input', function(e) {
             clearTimeout(searchTimeout);
@@ -806,7 +944,7 @@
             }, 300);
         });
 
-        // Función para exportar a Excel (XLSX) con los datos filtrados
+        // Función para exportar a Excel
         function exportToExcel() {
             if (filteredData.length === 0) {
                 alert('No hay datos para exportar');
@@ -822,17 +960,15 @@
                 const wb = XLSX.utils.book_new();
                 const ws = XLSX.utils.aoa_to_sheet(exportData);
                 
-                // Ajustar el ancho de las columnas automáticamente
+                // Ajustar el ancho de las columnas
                 const colWidths = [];
                 headers.forEach((header, index) => {
-                    // Calcular el ancho máximo basado en los datos
                     let maxLength = header ? header.toString().length : 10;
                     filteredData.forEach(row => {
                         if (row[index] !== undefined && row[index] !== null) {
                             maxLength = Math.max(maxLength, row[index].toString().length);
                         }
                     });
-                    // Limitar el ancho máximo y mínimo
                     colWidths.push({ wch: Math.min(Math.max(maxLength, 10), 50) });
                 });
                 ws['!cols'] = colWidths;
@@ -840,11 +976,10 @@
                 // Agregar la hoja al libro
                 XLSX.utils.book_append_sheet(wb, ws, 'Hoja1');
                 
-                // Generar nombre del archivo con fecha y filtros
+                // Generar nombre del archivo
                 const now = new Date();
                 const dateStr = `${now.getFullYear()}${(now.getMonth()+1).toString().padStart(2,'0')}${now.getDate().toString().padStart(2,'0')}_${now.getHours().toString().padStart(2,'0')}${now.getMinutes().toString().padStart(2,'0')}`;
                 
-                // Determinar el tipo de exportación para el nombre
                 let exportType = 'todos';
                 if (filteredData.length < allData.length) {
                     exportType = 'filtrados';
@@ -855,7 +990,6 @@
                 // Exportar el archivo
                 XLSX.writeFile(wb, fileName);
                 
-                // Mostrar mensaje de éxito
                 alert(`Archivo Excel generado exitosamente con ${filteredData.length} registros`);
                 
             } catch (error) {
@@ -864,7 +998,7 @@
             }
         }
 
-        // Iniciar carga cuando la página esté lista
+        // Iniciar carga
         window.addEventListener('load', loadExcel);
     </script>
 </body>
