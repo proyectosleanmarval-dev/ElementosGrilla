@@ -387,10 +387,11 @@
             <span class="file-info" id="fileInfo">Cargando archivo...</span>
         </div>
         
-        <!-- Filtros específicos -->
+        <!-- Filtros específicos - Reordenados: PROYECTO, COMPONENTE, ACTIVIDAD -->
         <div class="filters-section">
             <div class="filters-title">Filtros de búsqueda</div>
             <div class="filters-grid">
+                <!-- Primero: PROYECTO -->
                 <div class="filter-group">
                     <label for="filterProyecto">PROYECTO</label>
                     <select id="filterProyecto" class="filter-select" onchange="onProyectoChange()">
@@ -398,17 +399,19 @@
                     </select>
                 </div>
                 
+                <!-- Segundo: COMPONENTE (ahora va antes que actividad) -->
                 <div class="filter-group">
-                    <label for="filterActividad">ACTIVIDAD ALISTAMIENTO</label>
-                    <select id="filterActividad" class="filter-select" onchange="onActividadChange()">
-                        <option value="">Todas las actividades</option>
+                    <label for="filterComponente">COMPONENTE</label>
+                    <select id="filterComponente" class="filter-select" onchange="onComponenteChange()">
+                        <option value="">Todos los componentes</option>
                     </select>
                 </div>
                 
+                <!-- Tercero: ACTIVIDAD ALISTAMIENTO (depende de componente) -->
                 <div class="filter-group">
-                    <label for="filterComponente">COMPONENTE</label>
-                    <select id="filterComponente" class="filter-select">
-                        <option value="">Todos los componentes</option>
+                    <label for="filterActividad">ACTIVIDAD ALISTAMIENTO</label>
+                    <select id="filterActividad" class="filter-select">
+                        <option value="">Todas las actividades</option>
                     </select>
                 </div>
             </div>
@@ -476,9 +479,9 @@
         };
         
         // Relaciones para filtros dependientes
-        let proyectoActividades = new Map(); // Proyecto -> Set de actividades
         let proyectoComponentes = new Map(); // Proyecto -> Set de componentes
-        let actividadComponentes = new Map(); // Actividad -> Set de componentes
+        let componenteActividades = new Map(); // Componente -> Set de actividades
+        let proyectoActividades = new Map(); // Proyecto -> Set de actividades (para filtrado combinado)
         
         // Mapeo de índices de columnas
         let columnIndices = {
@@ -575,9 +578,9 @@
 
         function buildDependentFilters() {
             // Limpiar maps
-            proyectoActividades.clear();
             proyectoComponentes.clear();
-            actividadComponentes.clear();
+            componenteActividades.clear();
+            proyectoActividades.clear();
             
             // Sets para valores únicos
             const proyectosSet = new Set();
@@ -594,14 +597,6 @@
                 if (actividad) actividadesSet.add(actividad);
                 if (componente) componentesSet.add(componente);
                 
-                // Construir relaciones Proyecto -> Actividades
-                if (proyecto && actividad) {
-                    if (!proyectoActividades.has(proyecto)) {
-                        proyectoActividades.set(proyecto, new Set());
-                    }
-                    proyectoActividades.get(proyecto).add(actividad);
-                }
-                
                 // Construir relaciones Proyecto -> Componentes
                 if (proyecto && componente) {
                     if (!proyectoComponentes.has(proyecto)) {
@@ -610,12 +605,20 @@
                     proyectoComponentes.get(proyecto).add(componente);
                 }
                 
-                // Construir relaciones Actividad -> Componentes
-                if (actividad && componente) {
-                    if (!actividadComponentes.has(actividad)) {
-                        actividadComponentes.set(actividad, new Set());
+                // Construir relaciones Componente -> Actividades
+                if (componente && actividad) {
+                    if (!componenteActividades.has(componente)) {
+                        componenteActividades.set(componente, new Set());
                     }
-                    actividadComponentes.get(actividad).add(componente);
+                    componenteActividades.get(componente).add(actividad);
+                }
+                
+                // Construir relaciones Proyecto -> Actividades (para filtrado combinado)
+                if (proyecto && actividad) {
+                    if (!proyectoActividades.has(proyecto)) {
+                        proyectoActividades.set(proyecto, new Set());
+                    }
+                    proyectoActividades.get(proyecto).add(actividad);
                 }
             });
             
@@ -626,7 +629,7 @@
         }
 
         function populateFilters() {
-            // Poblar select de Proyectos (siempre todos)
+            // Poblar select de Proyectos
             const selectProyecto = document.getElementById('filterProyecto');
             selectProyecto.innerHTML = '<option value="">Todos los proyectos</option>';
             uniqueValues.proyectos.forEach(value => {
@@ -636,115 +639,111 @@
                 selectProyecto.appendChild(option);
             });
             
-            // Inicialmente, todos los filtros están habilitados con todas las opciones
-            updateDependentFilters();
-        }
-
-        function updateDependentFilters() {
-            const selectedProyecto = document.getElementById('filterProyecto').value;
-            const selectedActividad = document.getElementById('filterActividad').value;
-            
-            const selectActividad = document.getElementById('filterActividad');
+            // Poblar select de Componentes (inicialmente todos)
             const selectComponente = document.getElementById('filterComponente');
-            
-            // Actualizar filtro de Actividades basado en el Proyecto seleccionado
-            if (selectedProyecto) {
-                // Filtrar actividades por proyecto
-                const actividadesDelProyecto = proyectoActividades.get(selectedProyecto) || new Set();
-                const actividadesArray = Array.from(actividadesDelProyecto).sort();
-                
-                selectActividad.innerHTML = '<option value="">Todas las actividades</option>';
-                actividadesArray.forEach(value => {
-                    const option = document.createElement('option');
-                    option.value = value;
-                    option.textContent = value;
-                    if (selectedActividad === value) {
-                        option.selected = true;
-                    }
-                    selectActividad.appendChild(option);
-                });
-                selectActividad.disabled = false;
-            } else {
-                // Si no hay proyecto seleccionado, mostrar todas las actividades
-                selectActividad.innerHTML = '<option value="">Todas las actividades</option>';
-                uniqueValues.actividades.forEach(value => {
-                    const option = document.createElement('option');
-                    option.value = value;
-                    option.textContent = value;
-                    if (selectedActividad === value) {
-                        option.selected = true;
-                    }
-                    selectActividad.appendChild(option);
-                });
-                selectActividad.disabled = false;
-            }
-            
-            // Actualizar filtro de Componentes basado en Proyecto y Actividad
-            updateComponentesFilter(selectedProyecto, selectedActividad);
-        }
-
-        function updateComponentesFilter(proyecto, actividad) {
-            const selectComponente = document.getElementById('filterComponente');
-            const currentComponente = document.getElementById('filterComponente').value;
-            
-            let componentesArray = [];
-            
-            if (actividad) {
-                // Si hay actividad seleccionada, filtrar componentes por actividad
-                const componentesDeActividad = actividadComponentes.get(actividad) || new Set();
-                componentesArray = Array.from(componentesDeActividad).sort();
-            } else if (proyecto) {
-                // Si solo hay proyecto, filtrar componentes por proyecto
-                const componentesDeProyecto = proyectoComponentes.get(proyecto) || new Set();
-                componentesArray = Array.from(componentesDeProyecto).sort();
-            } else {
-                // Si no hay filtros, mostrar todos los componentes
-                componentesArray = uniqueValues.componentes;
-            }
-            
             selectComponente.innerHTML = '<option value="">Todos los componentes</option>';
-            componentesArray.forEach(value => {
+            uniqueValues.componentes.forEach(value => {
                 const option = document.createElement('option');
                 option.value = value;
                 option.textContent = value;
-                if (currentComponente === value) {
-                    option.selected = true;
-                }
                 selectComponente.appendChild(option);
+            });
+            
+            // Poblar select de Actividades (inicialmente todos)
+            const selectActividad = document.getElementById('filterActividad');
+            selectActividad.innerHTML = '<option value="">Todas las actividades</option>';
+            uniqueValues.actividades.forEach(value => {
+                const option = document.createElement('option');
+                option.value = value;
+                option.textContent = value;
+                selectActividad.appendChild(option);
             });
         }
 
         function onProyectoChange() {
-            // Cuando cambia el proyecto, resetear actividad y componente si es necesario
-            const selectActividad = document.getElementById('filterActividad');
-            const selectComponente = document.getElementById('filterComponente');
-            
-            // Resetear actividad si el proyecto actual no tiene la actividad seleccionada
             const selectedProyecto = document.getElementById('filterProyecto').value;
-            const selectedActividad = selectActividad.value;
+            const selectComponente = document.getElementById('filterComponente');
+            const selectActividad = document.getElementById('filterActividad');
             
-            if (selectedProyecto && selectedActividad) {
-                const actividadesDelProyecto = proyectoActividades.get(selectedProyecto) || new Set();
-                if (!actividadesDelProyecto.has(selectedActividad)) {
-                    selectActividad.value = ''; // Resetear actividad si no pertenece al proyecto
-                }
+            // Actualizar componentes basado en el proyecto seleccionado
+            if (selectedProyecto) {
+                // Filtrar componentes por proyecto
+                const componentesDelProyecto = proyectoComponentes.get(selectedProyecto) || new Set();
+                const componentesArray = Array.from(componentesDelProyecto).sort();
+                
+                selectComponente.innerHTML = '<option value="">Todos los componentes</option>';
+                componentesArray.forEach(value => {
+                    const option = document.createElement('option');
+                    option.value = value;
+                    option.textContent = value;
+                    selectComponente.appendChild(option);
+                });
+                selectComponente.disabled = false;
+            } else {
+                // Si no hay proyecto, mostrar todos los componentes
+                selectComponente.innerHTML = '<option value="">Todos los componentes</option>';
+                uniqueValues.componentes.forEach(value => {
+                    const option = document.createElement('option');
+                    option.value = value;
+                    option.textContent = value;
+                    selectComponente.appendChild(option);
+                });
+                selectComponente.disabled = false;
             }
             
-            updateDependentFilters();
+            // Actualizar actividades basado en el nuevo componente (o resetear si no hay componente)
+            const selectedComponente = selectComponente.value;
+            updateActividadesFilter(selectedProyecto, selectedComponente);
         }
 
-        function onActividadChange() {
-            // Cuando cambia la actividad, actualizar componentes
+        function onComponenteChange() {
             const selectedProyecto = document.getElementById('filterProyecto').value;
-            const selectedActividad = document.getElementById('filterActividad').value;
+            const selectedComponente = document.getElementById('filterComponente').value;
             
-            updateComponentesFilter(selectedProyecto, selectedActividad);
+            updateActividadesFilter(selectedProyecto, selectedComponente);
+        }
+
+        function updateActividadesFilter(proyecto, componente) {
+            const selectActividad = document.getElementById('filterActividad');
+            const currentActividad = selectActividad.value;
+            
+            let actividadesArray = [];
+            
+            if (componente) {
+                // Si hay componente seleccionado, filtrar actividades por componente
+                const actividadesDelComponente = componenteActividades.get(componente) || new Set();
+                actividadesArray = Array.from(actividadesDelComponente).sort();
+                
+                // Si también hay proyecto, hacer intersección con actividades del proyecto
+                if (proyecto) {
+                    const actividadesDelProyecto = proyectoActividades.get(proyecto) || new Set();
+                    actividadesArray = actividadesArray.filter(act => actividadesDelProyecto.has(act));
+                }
+            } else if (proyecto) {
+                // Si solo hay proyecto, filtrar actividades por proyecto
+                const actividadesDelProyecto = proyectoActividades.get(proyecto) || new Set();
+                actividadesArray = Array.from(actividadesDelProyecto).sort();
+            } else {
+                // Si no hay filtros, mostrar todas las actividades
+                actividadesArray = uniqueValues.actividades;
+            }
+            
+            selectActividad.innerHTML = '<option value="">Todas las actividades</option>';
+            actividadesArray.forEach(value => {
+                const option = document.createElement('option');
+                option.value = value;
+                option.textContent = value;
+                if (currentActividad === value) {
+                    option.selected = true;
+                }
+                selectActividad.appendChild(option);
+            });
         }
 
         function applyFilters() {
             const proyectoFilter = document.getElementById('filterProyecto').value;
-            const actividadFilter = document.getElementById('filterActividad').value;
             const componenteFilter = document.getElementById('filterComponente').value;
+            const actividadFilter = document.getElementById('filterActividad').value;
             const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
             
             filteredData = allData.filter(row => {
@@ -754,14 +753,14 @@
                     if (rowValue !== proyectoFilter) return false;
                 }
                 
-                if (actividadFilter && columnIndices.actividad !== -1) {
-                    const rowValue = row[columnIndices.actividad] ? row[columnIndices.actividad].toString() : '';
-                    if (rowValue !== actividadFilter) return false;
-                }
-                
                 if (componenteFilter && columnIndices.componente !== -1) {
                     const rowValue = row[columnIndices.componente] ? row[columnIndices.componente].toString() : '';
                     if (rowValue !== componenteFilter) return false;
+                }
+                
+                if (actividadFilter && columnIndices.actividad !== -1) {
+                    const rowValue = row[columnIndices.actividad] ? row[columnIndices.actividad].toString() : '';
+                    if (rowValue !== actividadFilter) return false;
                 }
                 
                 // Aplicar búsqueda general
@@ -782,12 +781,24 @@
 
         function clearFilters() {
             document.getElementById('filterProyecto').value = '';
-            document.getElementById('filterActividad').innerHTML = '<option value="">Todas las actividades</option>';
             document.getElementById('filterComponente').innerHTML = '<option value="">Todos los componentes</option>';
+            document.getElementById('filterActividad').innerHTML = '<option value="">Todas las actividades</option>';
             document.getElementById('searchInput').value = '';
             
             // Restaurar todos los filtros
-            updateDependentFilters();
+            uniqueValues.componentes.forEach(value => {
+                const option = document.createElement('option');
+                option.value = value;
+                option.textContent = value;
+                document.getElementById('filterComponente').appendChild(option);
+            });
+            
+            uniqueValues.actividades.forEach(value => {
+                const option = document.createElement('option');
+                option.value = value;
+                option.textContent = value;
+                document.getElementById('filterActividad').appendChild(option);
+            });
             
             filteredData = [...allData];
             currentPage = 1;
@@ -914,14 +925,14 @@
             
             // Actualizar estado de filtros
             const proyectoFilter = document.getElementById('filterProyecto').value;
-            const actividadFilter = document.getElementById('filterActividad').value;
             const componenteFilter = document.getElementById('filterComponente').value;
+            const actividadFilter = document.getElementById('filterActividad').value;
             const searchTerm = document.getElementById('searchInput').value;
             
             const activeFilters = [];
             if (proyectoFilter) activeFilters.push('Proyecto');
-            if (actividadFilter) activeFilters.push('Actividad');
             if (componenteFilter) activeFilters.push('Componente');
+            if (actividadFilter) activeFilters.push('Actividad');
             if (searchTerm) activeFilters.push('Búsqueda');
             
             document.getElementById('filterStatus').textContent = activeFilters.length > 0 ? 
