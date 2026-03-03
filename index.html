@@ -320,6 +320,32 @@
             margin-left: 5px;
         }
 
+        .stats-right {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .tipo-grilla-counter {
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 8px 15px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-left: 4px solid #2e7d32;
+        }
+
+        .tipo-grilla-counter span {
+            font-weight: 700;
+            font-size: 16px;
+            margin: 0 5px;
+        }
+
         .export-section {
             display: flex;
             gap: 10px;
@@ -429,7 +455,7 @@
             <span class="file-info" id="fileInfo">Cargando archivo...</span>
         </div>
         
-        <!-- Pestañas con nuevos nombres -->
+        <!-- Pestañas -->
         <div class="tabs">
             <div class="tab active" onclick="switchTab('hoja1')" id="tabHoja1">Actividades alistamiento</div>
             <div class="tab" onclick="switchTab('hoja3')" id="tabHoja3">Actividades de grilla</div>
@@ -437,27 +463,38 @@
         
         <!-- Contenido Hoja 1 - Actividades alistamiento -->
         <div id="hoja1Content" class="tab-content active">
-            <!-- Filtros específicos Hoja 1 -->
+            <!-- Filtros específicos Hoja 1 con nuevo filtro TIPO GRILLA -->
             <div class="filters-section">
                 <div class="filters-title">Filtros de búsqueda - Actividades alistamiento</div>
                 <div class="filters-grid">
+                    <!-- Nuevo filtro TIPO GRILLA (dependencia principal) -->
+                    <div class="filter-group">
+                        <label for="filterTipoGrilla">TIPO GRILLA</label>
+                        <select id="filterTipoGrilla" class="filter-select" onchange="onTipoGrillaChange()">
+                            <option value="">Todos los tipos de grilla</option>
+                        </select>
+                    </div>
+                    
+                    <!-- PROYECTO (depende de TIPO GRILLA) -->
                     <div class="filter-group">
                         <label for="filterProyecto">PROYECTO</label>
-                        <select id="filterProyecto" class="filter-select" onchange="onProyectoChange()">
+                        <select id="filterProyecto" class="filter-select" onchange="onProyectoChange()" disabled>
                             <option value="">Todos los proyectos</option>
                         </select>
                     </div>
                     
+                    <!-- COMPONENTE (depende de PROYECTO y TIPO GRILLA) -->
                     <div class="filter-group">
                         <label for="filterComponente">COMPONENTE</label>
-                        <select id="filterComponente" class="filter-select" onchange="onComponenteChange()">
+                        <select id="filterComponente" class="filter-select" onchange="onComponenteChange()" disabled>
                             <option value="">Todos los componentes</option>
                         </select>
                     </div>
                     
+                    <!-- ACTIVIDAD ALISTAMIENTO (depende de COMPONENTE, PROYECTO y TIPO GRILLA) -->
                     <div class="filter-group">
                         <label for="filterActividad">ACTIVIDAD ALISTAMIENTO</label>
-                        <select id="filterActividad" class="filter-select">
+                        <select id="filterActividad" class="filter-select" disabled>
                             <option value="">Todas las actividades</option>
                         </select>
                     </div>
@@ -550,29 +587,35 @@
             </div>
         </div>
         
-        <!-- Estadísticas y exportación (compartidas) -->
+        <!-- Estadísticas y exportación (compartidas) con contador de TIPO GRILLA -->
         <div class="stats" id="stats" style="display: none;">
             <div class="stats-left">
                 <div class="stat-item">Registros: <span class="stat-value" id="rowCount"></span></div>
                 <div class="stat-item">Columnas: <span class="stat-value" id="columnCount"></span></div>
                 <div class="stat-item">Filtros: <span class="stat-value" id="filterStatus">Sin filtros</span></div>
             </div>
-            <div class="export-section">
-                <div class="export-info" id="exportInfo">
-                    <span id="exportCount"></span>
+            <div class="stats-right">
+                <!-- Contador específico para TIPO GRILLA (solo visible en hoja1) -->
+                <div id="tipoGrillaCounter" class="tipo-grilla-counter" style="display: none;">
+                    🔢 Registros por TIPO GRILLA: <span id="tipoGrillaCount"></span>
                 </div>
-                <button class="export-btn" onclick="exportToExcel()">
-                    <span>📊</span> Exportar a Excel
-                </button>
-                <div class="rows-per-page">
-                    <span>Filas por página:</span>
-                    <select id="rowsPerPage" class="rows-select" onchange="changeRowsPerPage()">
-                        <option value="10">10</option>
-                        <option value="20" selected>20</option>
-                        <option value="50">50</option>
-                        <option value="100">100</option>
-                        <option value="all">Todas</option>
-                    </select>
+                <div class="export-section">
+                    <div class="export-info" id="exportInfo">
+                        <span id="exportCount"></span>
+                    </div>
+                    <button class="export-btn" onclick="exportToExcel()">
+                        <span>📊</span> Exportar a Excel
+                    </button>
+                    <div class="rows-per-page">
+                        <span>Filas por página:</span>
+                        <select id="rowsPerPage" class="rows-select" onchange="changeRowsPerPage()">
+                            <option value="10">10</option>
+                            <option value="20" selected>20</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                            <option value="all">Todas</option>
+                        </select>
+                    </div>
                 </div>
             </div>
         </div>
@@ -599,17 +642,23 @@
         let currentSheet = 'hoja1';
         let rowsPerPage = 20;
         
-        // Datos originales para filtros dependientes Hoja 1
+        // Datos originales para filtros dependientes Hoja 1 (ahora incluye TIPO GRILLA)
         let uniqueValuesHoja1 = {
+            tipoGrilla: [],
             proyectos: [],
             actividades: [],
             componentes: []
         };
         
-        // Relaciones para filtros dependientes Hoja 1
-        let proyectoComponentes = new Map();
-        let componenteActividades = new Map();
-        let proyectoActividades = new Map();
+        // Relaciones para filtros dependientes Hoja 1 con TIPO GRILLA
+        let tipoGrillaProyectos = new Map(); // TipoGrilla -> Set de proyectos
+        let tipoGrillaComponentes = new Map(); // TipoGrilla -> Set de componentes
+        let tipoGrillaActividades = new Map(); // TipoGrilla -> Set de actividades
+        
+        // Relaciones existentes (ahora filtradas por tipoGrilla)
+        let proyectoComponentes = new Map(); // Proyecto -> Set de componentes (ya filtrado por tipoGrilla)
+        let componenteActividades = new Map(); // Componente -> Set de actividades (ya filtrado por tipoGrilla)
+        let proyectoActividades = new Map(); // Proyecto -> Set de actividades (ya filtrado por tipoGrilla)
         
         // Datos para filtros Hoja 3
         let uniqueValuesHoja3 = {
@@ -621,8 +670,9 @@
             componentes: []
         };
         
-        // Mapeo de índices de columnas Hoja 1
+        // Mapeo de índices de columnas Hoja 1 (agregamos TIPO GRILLA)
         let columnIndicesHoja1 = {
+            tipoGrilla: -1,
             proyecto: -1,
             actividad: -1,
             componente: -1
@@ -702,10 +752,12 @@
                         allDataHoja1 = data;
                         filteredDataHoja1 = [...allDataHoja1];
                         
-                        // Identificar índices de las columnas Hoja 1
+                        // Identificar índices de las columnas Hoja 1 (incluyendo TIPO GRILLA)
                         headers.forEach((header, index) => {
                             const headerStr = (header || '').toString().toUpperCase().trim();
-                            if (headerStr.includes('PROYECTO')) {
+                            if (headerStr.includes('TIPO GRILLA') || headerStr.includes('TIPO_GRILLA') || headerStr.includes('TIPO-GRILLA')) {
+                                columnIndicesHoja1.tipoGrilla = index;
+                            } else if (headerStr.includes('PROYECTO')) {
                                 columnIndicesHoja1.proyecto = index;
                             } else if (headerStr.includes('ACTIVIDAD') && headerStr.includes('ALISTAMIENTO')) {
                                 columnIndicesHoja1.actividad = index;
@@ -714,7 +766,7 @@
                             }
                         });
                         
-                        // Construir relaciones para filtros dependientes Hoja 1
+                        // Construir relaciones para filtros dependientes Hoja 1 con TIPO GRILLA
                         buildDependentFiltersHoja1();
                         
                         // Poblar los filtros Hoja 1
@@ -765,22 +817,65 @@
         }
 
         function buildDependentFiltersHoja1() {
+            // Limpiar maps
+            tipoGrillaProyectos.clear();
+            tipoGrillaComponentes.clear();
+            tipoGrillaActividades.clear();
             proyectoComponentes.clear();
             componenteActividades.clear();
             proyectoActividades.clear();
             
+            // Sets para valores únicos
+            const tipoGrillaSet = new Set();
             const proyectosSet = new Set();
             const actividadesSet = new Set();
             const componentesSet = new Set();
             
+            // Primera pasada: recolectar todos los valores únicos
             allDataHoja1.forEach(row => {
+                const tipoGrilla = row[columnIndicesHoja1.tipoGrilla] ? row[columnIndicesHoja1.tipoGrilla].toString().trim() : '';
                 const proyecto = row[columnIndicesHoja1.proyecto] ? row[columnIndicesHoja1.proyecto].toString().trim() : '';
                 const actividad = row[columnIndicesHoja1.actividad] ? row[columnIndicesHoja1.actividad].toString().trim() : '';
                 const componente = row[columnIndicesHoja1.componente] ? row[columnIndicesHoja1.componente].toString().trim() : '';
                 
+                if (tipoGrilla) tipoGrillaSet.add(tipoGrilla);
                 if (proyecto) proyectosSet.add(proyecto);
                 if (actividad) actividadesSet.add(actividad);
                 if (componente) componentesSet.add(componente);
+            });
+            
+            uniqueValuesHoja1.tipoGrilla = Array.from(tipoGrillaSet).sort();
+            uniqueValuesHoja1.proyectos = Array.from(proyectosSet).sort();
+            uniqueValuesHoja1.actividades = Array.from(actividadesSet).sort();
+            uniqueValuesHoja1.componentes = Array.from(componentesSet).sort();
+            
+            // Segunda pasada: construir relaciones incluyendo TIPO GRILLA
+            allDataHoja1.forEach(row => {
+                const tipoGrilla = row[columnIndicesHoja1.tipoGrilla] ? row[columnIndicesHoja1.tipoGrilla].toString().trim() : '';
+                const proyecto = row[columnIndicesHoja1.proyecto] ? row[columnIndicesHoja1.proyecto].toString().trim() : '';
+                const actividad = row[columnIndicesHoja1.actividad] ? row[columnIndicesHoja1.actividad].toString().trim() : '';
+                const componente = row[columnIndicesHoja1.componente] ? row[columnIndicesHoja1.componente].toString().trim() : '';
+                
+                if (tipoGrilla && proyecto) {
+                    if (!tipoGrillaProyectos.has(tipoGrilla)) {
+                        tipoGrillaProyectos.set(tipoGrilla, new Set());
+                    }
+                    tipoGrillaProyectos.get(tipoGrilla).add(proyecto);
+                }
+                
+                if (tipoGrilla && componente) {
+                    if (!tipoGrillaComponentes.has(tipoGrilla)) {
+                        tipoGrillaComponentes.set(tipoGrilla, new Set());
+                    }
+                    tipoGrillaComponentes.get(tipoGrilla).add(componente);
+                }
+                
+                if (tipoGrilla && actividad) {
+                    if (!tipoGrillaActividades.has(tipoGrilla)) {
+                        tipoGrillaActividades.set(tipoGrilla, new Set());
+                    }
+                    tipoGrillaActividades.get(tipoGrilla).add(actividad);
+                }
                 
                 if (proyecto && componente) {
                     if (!proyectoComponentes.has(proyecto)) {
@@ -803,10 +898,6 @@
                     proyectoActividades.get(proyecto).add(actividad);
                 }
             });
-            
-            uniqueValuesHoja1.proyectos = Array.from(proyectosSet).sort();
-            uniqueValuesHoja1.actividades = Array.from(actividadesSet).sort();
-            uniqueValuesHoja1.componentes = Array.from(componentesSet).sort();
         }
 
         function buildUniqueValuesHoja3() {
@@ -858,32 +949,17 @@
         }
 
         function populateFiltersHoja1() {
-            const selectProyecto = document.getElementById('filterProyecto');
-            selectProyecto.innerHTML = '<option value="">Todos los proyectos</option>';
-            uniqueValuesHoja1.proyectos.forEach(value => {
+            // Poblar TIPO GRILLA
+            const selectTipoGrilla = document.getElementById('filterTipoGrilla');
+            selectTipoGrilla.innerHTML = '<option value="">Todos los tipos de grilla</option>';
+            uniqueValuesHoja1.tipoGrilla.forEach(value => {
                 const option = document.createElement('option');
                 option.value = value;
                 option.textContent = value;
-                selectProyecto.appendChild(option);
+                selectTipoGrilla.appendChild(option);
             });
             
-            const selectComponente = document.getElementById('filterComponente');
-            selectComponente.innerHTML = '<option value="">Todos los componentes</option>';
-            uniqueValuesHoja1.componentes.forEach(value => {
-                const option = document.createElement('option');
-                option.value = value;
-                option.textContent = value;
-                selectComponente.appendChild(option);
-            });
-            
-            const selectActividad = document.getElementById('filterActividad');
-            selectActividad.innerHTML = '<option value="">Todas las actividades</option>';
-            uniqueValuesHoja1.actividades.forEach(value => {
-                const option = document.createElement('option');
-                option.value = value;
-                option.textContent = value;
-                selectActividad.appendChild(option);
-            });
+            // Los demás filtros se poblaran cuando se seleccione un tipo de grilla
         }
 
         function populateFiltersHoja3() {
@@ -953,7 +1029,187 @@
             document.getElementById(`${tabId}Content`).classList.add('active');
             
             currentSheet = tabId;
+            
+            // Mostrar/ocultar contador de TIPO GRILLA según la pestaña
+            const tipoGrillaCounter = document.getElementById('tipoGrillaCounter');
+            if (currentSheet === 'hoja1') {
+                tipoGrillaCounter.style.display = 'flex';
+                updateTipoGrillaCounter();
+            } else {
+                tipoGrillaCounter.style.display = 'none';
+            }
+            
             displayCurrentSheet();
+        }
+
+        function onTipoGrillaChange() {
+            const selectedTipoGrilla = document.getElementById('filterTipoGrilla').value;
+            const selectProyecto = document.getElementById('filterProyecto');
+            const selectComponente = document.getElementById('filterComponente');
+            const selectActividad = document.getElementById('filterActividad');
+            
+            // Habilitar/deshabilitar y poblar filtros según el tipo de grilla seleccionado
+            if (selectedTipoGrilla) {
+                // Poblar proyectos según el tipo de grilla
+                const proyectosDelTipo = tipoGrillaProyectos.get(selectedTipoGrilla) || new Set();
+                const proyectosArray = Array.from(proyectosDelTipo).sort();
+                
+                selectProyecto.innerHTML = '<option value="">Todos los proyectos</option>';
+                proyectosArray.forEach(value => {
+                    const option = document.createElement('option');
+                    option.value = value;
+                    option.textContent = value;
+                    selectProyecto.appendChild(option);
+                });
+                selectProyecto.disabled = false;
+                
+                // Poblar componentes según el tipo de grilla
+                const componentesDelTipo = tipoGrillaComponentes.get(selectedTipoGrilla) || new Set();
+                const componentesArray = Array.from(componentesDelTipo).sort();
+                
+                selectComponente.innerHTML = '<option value="">Todos los componentes</option>';
+                componentesArray.forEach(value => {
+                    const option = document.createElement('option');
+                    option.value = value;
+                    option.textContent = value;
+                    selectComponente.appendChild(option);
+                });
+                selectComponente.disabled = false;
+                
+                // Poblar actividades según el tipo de grilla
+                const actividadesDelTipo = tipoGrillaActividades.get(selectedTipoGrilla) || new Set();
+                const actividadesArray = Array.from(actividadesDelTipo).sort();
+                
+                selectActividad.innerHTML = '<option value="">Todas las actividades</option>';
+                actividadesArray.forEach(value => {
+                    const option = document.createElement('option');
+                    option.value = value;
+                    option.textContent = value;
+                    selectActividad.appendChild(option);
+                });
+                selectActividad.disabled = false;
+                
+            } else {
+                // Si no hay tipo de grilla, deshabilitar todos los filtros
+                selectProyecto.innerHTML = '<option value="">Todos los proyectos</option>';
+                selectProyecto.disabled = true;
+                
+                selectComponente.innerHTML = '<option value="">Todos los componentes</option>';
+                selectComponente.disabled = true;
+                
+                selectActividad.innerHTML = '<option value="">Todas las actividades</option>';
+                selectActividad.disabled = true;
+            }
+            
+            // Actualizar contador de TIPO GRILLA
+            updateTipoGrillaCounter();
+        }
+
+        function onProyectoChange() {
+            const selectedTipoGrilla = document.getElementById('filterTipoGrilla').value;
+            const selectedProyecto = document.getElementById('filterProyecto').value;
+            const selectComponente = document.getElementById('filterComponente');
+            const selectActividad = document.getElementById('filterActividad');
+            
+            if (selectedProyecto) {
+                // Filtrar componentes por proyecto (dentro del tipo de grilla seleccionado)
+                const componentesDelProyecto = proyectoComponentes.get(selectedProyecto) || new Set();
+                const componentesArray = Array.from(componentesDelProyecto).sort();
+                
+                // Si hay tipo de grilla, filtrar también por él
+                let componentesFiltrados = componentesArray;
+                if (selectedTipoGrilla) {
+                    const componentesDelTipo = tipoGrillaComponentes.get(selectedTipoGrilla) || new Set();
+                    componentesFiltrados = componentesArray.filter(comp => componentesDelTipo.has(comp));
+                }
+                
+                selectComponente.innerHTML = '<option value="">Todos los componentes</option>';
+                componentesFiltrados.forEach(value => {
+                    const option = document.createElement('option');
+                    option.value = value;
+                    option.textContent = value;
+                    selectComponente.appendChild(option);
+                });
+                selectComponente.disabled = false;
+            } else {
+                // Si no hay proyecto, mostrar todos los componentes del tipo de grilla
+                if (selectedTipoGrilla) {
+                    const componentesDelTipo = tipoGrillaComponentes.get(selectedTipoGrilla) || new Set();
+                    const componentesArray = Array.from(componentesDelTipo).sort();
+                    
+                    selectComponente.innerHTML = '<option value="">Todos los componentes</option>';
+                    componentesArray.forEach(value => {
+                        const option = document.createElement('option');
+                        option.value = value;
+                        option.textContent = value;
+                        selectComponente.appendChild(option);
+                    });
+                    selectComponente.disabled = false;
+                }
+            }
+            
+            const selectedComponente = selectComponente.value;
+            updateActividadesFilter(selectedTipoGrilla, selectedProyecto, selectedComponente);
+        }
+
+        function onComponenteChange() {
+            const selectedTipoGrilla = document.getElementById('filterTipoGrilla').value;
+            const selectedProyecto = document.getElementById('filterProyecto').value;
+            const selectedComponente = document.getElementById('filterComponente').value;
+            
+            updateActividadesFilter(selectedTipoGrilla, selectedProyecto, selectedComponente);
+        }
+
+        function updateActividadesFilter(tipoGrilla, proyecto, componente) {
+            const selectActividad = document.getElementById('filterActividad');
+            const currentActividad = selectActividad.value;
+            
+            let actividadesArray = [];
+            
+            if (componente) {
+                // Actividades del componente
+                const actividadesDelComponente = componenteActividades.get(componente) || new Set();
+                actividadesArray = Array.from(actividadesDelComponente).sort();
+                
+                // Filtrar por proyecto si existe
+                if (proyecto) {
+                    const actividadesDelProyecto = proyectoActividades.get(proyecto) || new Set();
+                    actividadesArray = actividadesArray.filter(act => actividadesDelProyecto.has(act));
+                }
+                
+                // Filtrar por tipo de grilla si existe
+                if (tipoGrilla) {
+                    const actividadesDelTipo = tipoGrillaActividades.get(tipoGrilla) || new Set();
+                    actividadesArray = actividadesArray.filter(act => actividadesDelTipo.has(act));
+                }
+            } else if (proyecto) {
+                // Actividades del proyecto
+                const actividadesDelProyecto = proyectoActividades.get(proyecto) || new Set();
+                actividadesArray = Array.from(actividadesDelProyecto).sort();
+                
+                // Filtrar por tipo de grilla si existe
+                if (tipoGrilla) {
+                    const actividadesDelTipo = tipoGrillaActividades.get(tipoGrilla) || new Set();
+                    actividadesArray = actividadesArray.filter(act => actividadesDelTipo.has(act));
+                }
+            } else if (tipoGrilla) {
+                // Actividades del tipo de grilla
+                const actividadesDelTipo = tipoGrillaActividades.get(tipoGrilla) || new Set();
+                actividadesArray = Array.from(actividadesDelTipo).sort();
+            } else {
+                actividadesArray = uniqueValuesHoja1.actividades;
+            }
+            
+            selectActividad.innerHTML = '<option value="">Todas las actividades</option>';
+            actividadesArray.forEach(value => {
+                const option = document.createElement('option');
+                option.value = value;
+                option.textContent = value;
+                if (currentActividad === value) {
+                    option.selected = true;
+                }
+                selectActividad.appendChild(option);
+            });
         }
 
         function displayCurrentSheet() {
@@ -1011,6 +1267,7 @@
                 document.getElementById('stats').style.display = 'flex';
                 updateStatsHoja1();
                 updatePaginationHoja1(rowsPerPageValue);
+                updateTipoGrillaCounter();
             }
         }
 
@@ -1064,78 +1321,6 @@
             }
         }
 
-        function onProyectoChange() {
-            const selectedProyecto = document.getElementById('filterProyecto').value;
-            const selectComponente = document.getElementById('filterComponente');
-            const selectActividad = document.getElementById('filterActividad');
-            
-            if (selectedProyecto) {
-                const componentesDelProyecto = proyectoComponentes.get(selectedProyecto) || new Set();
-                const componentesArray = Array.from(componentesDelProyecto).sort();
-                
-                selectComponente.innerHTML = '<option value="">Todos los componentes</option>';
-                componentesArray.forEach(value => {
-                    const option = document.createElement('option');
-                    option.value = value;
-                    option.textContent = value;
-                    selectComponente.appendChild(option);
-                });
-                selectComponente.disabled = false;
-            } else {
-                selectComponente.innerHTML = '<option value="">Todos los componentes</option>';
-                uniqueValuesHoja1.componentes.forEach(value => {
-                    const option = document.createElement('option');
-                    option.value = value;
-                    option.textContent = value;
-                    selectComponente.appendChild(option);
-                });
-                selectComponente.disabled = false;
-            }
-            
-            const selectedComponente = selectComponente.value;
-            updateActividadesFilter(selectedProyecto, selectedComponente);
-        }
-
-        function onComponenteChange() {
-            const selectedProyecto = document.getElementById('filterProyecto').value;
-            const selectedComponente = document.getElementById('filterComponente').value;
-            
-            updateActividadesFilter(selectedProyecto, selectedComponente);
-        }
-
-        function updateActividadesFilter(proyecto, componente) {
-            const selectActividad = document.getElementById('filterActividad');
-            const currentActividad = selectActividad.value;
-            
-            let actividadesArray = [];
-            
-            if (componente) {
-                const actividadesDelComponente = componenteActividades.get(componente) || new Set();
-                actividadesArray = Array.from(actividadesDelComponente).sort();
-                
-                if (proyecto) {
-                    const actividadesDelProyecto = proyectoActividades.get(proyecto) || new Set();
-                    actividadesArray = actividadesArray.filter(act => actividadesDelProyecto.has(act));
-                }
-            } else if (proyecto) {
-                const actividadesDelProyecto = proyectoActividades.get(proyecto) || new Set();
-                actividadesArray = Array.from(actividadesDelProyecto).sort();
-            } else {
-                actividadesArray = uniqueValuesHoja1.actividades;
-            }
-            
-            selectActividad.innerHTML = '<option value="">Todas las actividades</option>';
-            actividadesArray.forEach(value => {
-                const option = document.createElement('option');
-                option.value = value;
-                option.textContent = value;
-                if (currentActividad === value) {
-                    option.selected = true;
-                }
-                selectActividad.appendChild(option);
-            });
-        }
-
         function applyFilters(sheet) {
             if (sheet === 'hoja1') {
                 applyFiltersHoja1();
@@ -1145,12 +1330,19 @@
         }
 
         function applyFiltersHoja1() {
+            const tipoGrillaFilter = document.getElementById('filterTipoGrilla').value;
             const proyectoFilter = document.getElementById('filterProyecto').value;
             const componenteFilter = document.getElementById('filterComponente').value;
             const actividadFilter = document.getElementById('filterActividad').value;
             const searchTerm = document.getElementById('searchInputHoja1').value.toLowerCase().trim();
             
             filteredDataHoja1 = allDataHoja1.filter(row => {
+                // Aplicar filtro de TIPO GRILLA
+                if (tipoGrillaFilter && columnIndicesHoja1.tipoGrilla !== -1) {
+                    const rowValue = row[columnIndicesHoja1.tipoGrilla] ? row[columnIndicesHoja1.tipoGrilla].toString() : '';
+                    if (rowValue !== tipoGrillaFilter) return false;
+                }
+                
                 if (proyectoFilter && columnIndicesHoja1.proyecto !== -1) {
                     const rowValue = row[columnIndicesHoja1.proyecto] ? row[columnIndicesHoja1.proyecto].toString() : '';
                     if (rowValue !== proyectoFilter) return false;
@@ -1179,6 +1371,7 @@
             currentPageHoja1 = 1;
             if (currentSheet === 'hoja1') {
                 displayDataHoja1();
+                updateTipoGrillaCounter();
             }
         }
 
@@ -1240,29 +1433,21 @@
 
         function clearFilters(sheet) {
             if (sheet === 'hoja1') {
-                document.getElementById('filterProyecto').value = '';
+                document.getElementById('filterTipoGrilla').value = '';
+                document.getElementById('filterProyecto').innerHTML = '<option value="">Todos los proyectos</option>';
                 document.getElementById('filterComponente').innerHTML = '<option value="">Todos los componentes</option>';
                 document.getElementById('filterActividad').innerHTML = '<option value="">Todas las actividades</option>';
                 document.getElementById('searchInputHoja1').value = '';
                 
-                uniqueValuesHoja1.componentes.forEach(value => {
-                    const option = document.createElement('option');
-                    option.value = value;
-                    option.textContent = value;
-                    document.getElementById('filterComponente').appendChild(option);
-                });
-                
-                uniqueValuesHoja1.actividades.forEach(value => {
-                    const option = document.createElement('option');
-                    option.value = value;
-                    option.textContent = value;
-                    document.getElementById('filterActividad').appendChild(option);
-                });
+                document.getElementById('filterProyecto').disabled = true;
+                document.getElementById('filterComponente').disabled = true;
+                document.getElementById('filterActividad').disabled = true;
                 
                 filteredDataHoja1 = [...allDataHoja1];
                 currentPageHoja1 = 1;
                 if (currentSheet === 'hoja1') {
                     displayDataHoja1();
+                    updateTipoGrillaCounter();
                 }
             } else {
                 document.getElementById('filterHC').value = '';
@@ -1281,17 +1466,50 @@
             }
         }
 
+        function updateTipoGrillaCounter() {
+            const tipoGrillaFilter = document.getElementById('filterTipoGrilla').value;
+            const tipoGrillaSpan = document.getElementById('tipoGrillaCount');
+            
+            if (tipoGrillaFilter && columnIndicesHoja1.tipoGrilla !== -1) {
+                // Contar registros por tipo de grilla específico
+                const count = allDataHoja1.filter(row => {
+                    const rowValue = row[columnIndicesHoja1.tipoGrilla] ? row[columnIndicesHoja1.tipoGrilla].toString() : '';
+                    return rowValue === tipoGrillaFilter;
+                }).length;
+                
+                tipoGrillaSpan.textContent = `${tipoGrillaFilter}: ${count}`;
+            } else {
+                // Mostrar conteo por cada tipo de grilla
+                const counts = new Map();
+                allDataHoja1.forEach(row => {
+                    const tipoGrilla = row[columnIndicesHoja1.tipoGrilla] ? row[columnIndicesHoja1.tipoGrilla].toString() : '';
+                    if (tipoGrilla) {
+                        counts.set(tipoGrilla, (counts.get(tipoGrilla) || 0) + 1);
+                    }
+                });
+                
+                const countsArray = Array.from(counts.entries())
+                    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+                    .map(([tipo, count]) => `${tipo}: ${count}`)
+                    .join(' | ');
+                
+                tipoGrillaSpan.textContent = countsArray || 'Sin datos';
+            }
+        }
+
         function updateStatsHoja1() {
             document.getElementById('rowCount').textContent = `${filteredDataHoja1.length} de ${allDataHoja1.length}`;
             document.getElementById('columnCount').textContent = headersHoja1.length;
             document.getElementById('exportCount').textContent = `Exportando: ${filteredDataHoja1.length} registros`;
             
+            const tipoGrillaFilter = document.getElementById('filterTipoGrilla').value;
             const proyectoFilter = document.getElementById('filterProyecto').value;
             const componenteFilter = document.getElementById('filterComponente').value;
             const actividadFilter = document.getElementById('filterActividad').value;
             const searchTerm = document.getElementById('searchInputHoja1').value;
             
             const activeFilters = [];
+            if (tipoGrillaFilter) activeFilters.push('Tipo Grilla');
             if (proyectoFilter) activeFilters.push('Proyecto');
             if (componenteFilter) activeFilters.push('Componente');
             if (actividadFilter) activeFilters.push('Actividad');
