@@ -429,17 +429,17 @@
             <span class="file-info" id="fileInfo">Cargando archivo...</span>
         </div>
         
-        <!-- Pestañas -->
+        <!-- Pestañas con nuevos nombres -->
         <div class="tabs">
-            <div class="tab active" onclick="switchTab('hoja1')" id="tabHoja1">Hoja 1</div>
-            <div class="tab" onclick="switchTab('hoja3')" id="tabHoja3">Hoja 3</div>
+            <div class="tab active" onclick="switchTab('hoja1')" id="tabHoja1">Actividades alistamiento</div>
+            <div class="tab" onclick="switchTab('hoja3')" id="tabHoja3">Actividades de grilla</div>
         </div>
         
-        <!-- Contenido Hoja 1 -->
+        <!-- Contenido Hoja 1 - Actividades alistamiento -->
         <div id="hoja1Content" class="tab-content active">
             <!-- Filtros específicos Hoja 1 -->
             <div class="filters-section">
-                <div class="filters-title">Filtros de búsqueda - Hoja 1</div>
+                <div class="filters-title">Filtros de búsqueda - Actividades alistamiento</div>
                 <div class="filters-grid">
                     <div class="filter-group">
                         <label for="filterProyecto">PROYECTO</label>
@@ -482,11 +482,11 @@
             </div>
         </div>
         
-        <!-- Contenido Hoja 3 -->
+        <!-- Contenido Hoja 3 - Actividades de grilla -->
         <div id="hoja3Content" class="tab-content">
             <!-- Filtros específicos Hoja 3 -->
             <div class="filters-section">
-                <div class="filters-title">Filtros de búsqueda - Hoja 3</div>
+                <div class="filters-title">Filtros de búsqueda - Actividades de grilla</div>
                 <div class="filters-grid">
                     <div class="filter-group">
                         <label for="filterHC">HC</label>
@@ -583,13 +583,13 @@
     <script>
         let workbook = null;
         
-        // Estados para Hoja 1
+        // Estados para Hoja 1 - Actividades alistamiento
         let allDataHoja1 = [];
         let headersHoja1 = [];
         let filteredDataHoja1 = [];
         let currentPageHoja1 = 1;
         
-        // Estados para Hoja 3
+        // Estados para Hoja 3 - Actividades de grilla
         let allDataHoja3 = [];
         let headersHoja3 = [];
         let filteredDataHoja3 = [];
@@ -652,12 +652,12 @@
                 // Leer el workbook completo
                 workbook = XLSX.read(data, {type: 'array'});
                 
-                // Cargar Hoja1 si existe
+                // Cargar Hoja1 si existe (Actividades alistamiento)
                 if (workbook.SheetNames.includes('Hoja1')) {
                     loadSheet('Hoja1', 'hoja1');
                 }
                 
-                // Cargar Hoja3 si existe
+                // Cargar Hoja3 si existe (Actividades de grilla)
                 if (workbook.SheetNames.includes('Hoja3')) {
                     loadSheet('Hoja3', 'hoja3');
                 }
@@ -1453,10 +1453,10 @@
             
             if (currentSheet === 'hoja1') {
                 dataToExport = filteredDataHoja1;
-                sheetName = 'Hoja1';
+                sheetName = 'Actividades_alistamiento';
             } else {
                 dataToExport = filteredDataHoja3;
-                sheetName = 'Hoja3';
+                sheetName = 'Actividades_grilla';
             }
             
             if (dataToExport.length === 0) {
@@ -1489,7 +1489,7 @@
                 const now = new Date();
                 const dateStr = `${now.getFullYear()}${(now.getMonth()+1).toString().padStart(2,'0')}${now.getDate().toString().padStart(2,'0')}_${now.getHours().toString().padStart(2,'0')}${now.getMinutes().toString().padStart(2,'0')}`;
                 
-                const fileName = `Actividades_Alistamiento_Bogota_${sheetName}_${dateStr}.xlsx`;
+                const fileName = `Actividades_${sheetName}_${dateStr}.xlsx`;
                 
                 XLSX.writeFile(wb, fileName);
                 
