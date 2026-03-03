@@ -516,7 +516,7 @@
             <span class="file-info" id="fileInfo">Cargando archivo...</span>
         </div>
         
-        <!-- Pestañas con nuevos nombres -->
+        <!-- Pestañas -->
         <div class="tabs">
             <div class="tab active" onclick="switchTab('hoja1')" id="tabHoja1">Actividades en grilla</div>
             <div class="tab" onclick="switchTab('hoja3')" id="tabHoja3">Avances de actividades</div>
@@ -1132,8 +1132,8 @@
             const selectedComponente = document.getElementById('filterComponente').value;
             updateActividadesFilter(selectedTipoGrilla, selectedProyecto, selectedComponente);
             
-            // Actualizar contadores
-            updateTipoGrillaCounters();
+            // Aplicar filtros automáticamente
+            applyFilters('hoja1');
         }
 
         function onProyectoChange() {
@@ -1440,7 +1440,7 @@
             currentPageHoja1 = 1;
             if (currentSheet === 'hoja1') {
                 displayDataHoja1();
-                updateTipoGrillaCounters();
+                updateTipoGrillaCounters(); // Actualizar contadores después de aplicar filtros
             }
         }
 
@@ -1517,7 +1517,7 @@
                 currentPageHoja1 = 1;
                 if (currentSheet === 'hoja1') {
                     displayDataHoja1();
-                    updateTipoGrillaCounters();
+                    updateTipoGrillaCounters(); // Actualizar contadores después de limpiar filtros
                 }
             } else {
                 document.getElementById('filterHC').value = '';
@@ -1536,18 +1536,28 @@
             }
         }
 
+        // Función corregida para actualizar contadores usando datos filtrados
         function updateTipoGrillaCounters() {
             const countersGrid = document.getElementById('tipoGrillaCountersGrid');
             const selectedTipoGrilla = document.getElementById('filterTipoGrilla').value;
             
-            // Calcular conteos por tipo de grilla
+            // Usar los datos filtrados en lugar de todos los datos
+            const dataToCount = filteredDataHoja1.length > 0 ? filteredDataHoja1 : allDataHoja1;
+            
+            // Calcular conteos por tipo de grilla usando los datos filtrados
             const counts = new Map();
-            allDataHoja1.forEach(row => {
+            dataToCount.forEach(row => {
                 const tipoGrilla = row[columnIndicesHoja1.tipoGrilla] ? row[columnIndicesHoja1.tipoGrilla].toString() : '';
                 if (tipoGrilla) {
                     counts.set(tipoGrilla, (counts.get(tipoGrilla) || 0) + 1);
                 }
             });
+            
+            // Si no hay resultados, mostrar mensaje
+            if (counts.size === 0) {
+                countersGrid.innerHTML = '<div class="counter-card">No hay datos para mostrar</div>';
+                return;
+            }
             
             // Ordenar por cantidad (descendente) y luego por nombre
             const sortedCounts = Array.from(counts.entries())
