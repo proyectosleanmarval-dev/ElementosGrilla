@@ -51,6 +51,7 @@
             margin-bottom: 25px;
             border-bottom: 2px solid #eef2f7;
             padding-bottom: 10px;
+            flex-wrap: wrap;
         }
 
         .tab {
@@ -520,6 +521,7 @@
         <div class="tabs">
             <div class="tab active" onclick="switchTab('hoja1')" id="tabHoja1">Actividades en grilla</div>
             <div class="tab" onclick="switchTab('hoja3')" id="tabHoja3">Avances de actividades</div>
+            <div class="tab" onclick="switchTab('proyectos')" id="tabProyectos">Proyectos Grilla</div>
         </div>
         
         <!-- Contenido Hoja 1 - Actividades en grilla -->
@@ -656,6 +658,46 @@
             </div>
         </div>
         
+        <!-- Contenido Proyectos Grilla - Nueva pestaña -->
+        <div id="proyectosContent" class="tab-content">
+            <!-- Filtros específicos Proyectos Grilla -->
+            <div class="filters-section">
+                <div class="filters-title">Filtros de búsqueda - Proyectos Grilla</div>
+                <div class="filters-grid">
+                    <div class="filter-group">
+                        <label for="filterProyectoPG">PROYECTO</label>
+                        <select id="filterProyectoPG" class="filter-select">
+                            <option value="">Todos los proyectos</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="filterAgrupacion">AGRUPACION</label>
+                        <select id="filterAgrupacion" class="filter-select">
+                            <option value="">Todas las agrupaciones</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="filter-actions">
+                    <button class="btn btn-secondary" onclick="clearFilters('proyectos')">Limpiar filtros</button>
+                    <button class="btn btn-primary" onclick="applyFilters('proyectos')">Aplicar filtros</button>
+                </div>
+            </div>
+            
+            <!-- Búsqueda global Proyectos Grilla -->
+            <div class="search-box">
+                <input type="text" class="search-input" id="searchInputProyectos" placeholder="Búsqueda general en todos los campos...">
+            </div>
+            
+            <div id="excelContentProyectos">
+                <div class="loading">
+                    <div>Cargando archivo Excel...</div>
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </div>
+        
         <!-- Estadísticas y exportación (compartidas) -->
         <div class="stats" id="stats" style="display: none;">
             <div class="stats-left">
@@ -703,6 +745,12 @@
         let filteredDataHoja3 = [];
         let currentPageHoja3 = 1;
         
+        // Estados para Proyectos Grilla
+        let allDataProyectos = [];
+        let headersProyectos = [];
+        let filteredDataProyectos = [];
+        let currentPageProyectos = 1;
+        
         // Estado compartido
         let currentSheet = 'hoja1';
         let rowsPerPage = 20;
@@ -735,6 +783,12 @@
             componentes: []
         };
         
+        // Datos para filtros Proyectos Grilla
+        let uniqueValuesProyectos = {
+            proyectos: [],
+            agrupaciones: []
+        };
+        
         // Mapeo de índices de columnas Hoja 1
         let columnIndicesHoja1 = {
             tipoGrilla: -1,
@@ -751,6 +805,12 @@
             tipo: -1,
             sucursal: -1,
             componente: -1
+        };
+        
+        // Mapeo de índices de columnas Proyectos Grilla
+        let columnIndicesProyectos = {
+            proyecto: -1,
+            agrupacion: -1
         };
 
         // Cargar el archivo Excel directamente
@@ -775,6 +835,11 @@
                 // Cargar Hoja3 si existe (Avances de actividades)
                 if (workbook.SheetNames.includes('Hoja3')) {
                     loadSheet('Hoja3', 'hoja3');
+                }
+                
+                // Cargar ProyectosGrilla si existe
+                if (workbook.SheetNames.includes('ProyectosGrilla')) {
+                    loadSheet('ProyectosGrilla', 'proyectos');
                 }
                 
                 document.getElementById('fileInfo').textContent = `✓ Archivo cargado: ${workbook.SheetNames.length} hoja(s) disponible(s)`;
@@ -865,6 +930,27 @@
                         
                         // Poblar los filtros Hoja 3
                         populateFiltersHoja3();
+                        
+                    } else if (targetSheet === 'proyectos') {
+                        headersProyectos = headers;
+                        allDataProyectos = data;
+                        filteredDataProyectos = [...allDataProyectos];
+                        
+                        // Identificar índices de las columnas Proyectos Grilla
+                        headers.forEach((header, index) => {
+                            const headerStr = (header || '').toString().toUpperCase().trim();
+                            if (headerStr === 'PROYECTO') {
+                                columnIndicesProyectos.proyecto = index;
+                            } else if (headerStr === 'AGRUPACION') {
+                                columnIndicesProyectos.agrupacion = index;
+                            }
+                        });
+                        
+                        // Construir valores únicos para filtros Proyectos Grilla
+                        buildUniqueValuesProyectos();
+                        
+                        // Poblar los filtros Proyectos Grilla
+                        populateFiltersProyectos();
                     }
                     
                 } else {
@@ -1017,6 +1103,26 @@
             uniqueValuesHoja3.componentes = Array.from(componentesSet).sort();
         }
 
+        function buildUniqueValuesProyectos() {
+            const proyectosSet = new Set();
+            const agrupacionesSet = new Set();
+            
+            allDataProyectos.forEach(row => {
+                if (columnIndicesProyectos.proyecto !== -1) {
+                    const proyecto = row[columnIndicesProyectos.proyecto] ? row[columnIndicesProyectos.proyecto].toString().trim() : '';
+                    if (proyecto) proyectosSet.add(proyecto);
+                }
+                
+                if (columnIndicesProyectos.agrupacion !== -1) {
+                    const agrupacion = row[columnIndicesProyectos.agrupacion] ? row[columnIndicesProyectos.agrupacion].toString().trim() : '';
+                    if (agrupacion) agrupacionesSet.add(agrupacion);
+                }
+            });
+            
+            uniqueValuesProyectos.proyectos = Array.from(proyectosSet).sort();
+            uniqueValuesProyectos.agrupaciones = Array.from(agrupacionesSet).sort();
+        }
+
         function populateFiltersHoja1() {
             // Poblar TIPO GRILLA
             const selectTipoGrilla = document.getElementById('filterTipoGrilla');
@@ -1094,14 +1200,47 @@
             });
         }
 
+        function populateFiltersProyectos() {
+            // Poblar PROYECTO
+            const selectProyecto = document.getElementById('filterProyectoPG');
+            selectProyecto.innerHTML = '<option value="">Todos los proyectos</option>';
+            uniqueValuesProyectos.proyectos.forEach(value => {
+                const option = document.createElement('option');
+                option.value = value;
+                option.textContent = value;
+                selectProyecto.appendChild(option);
+            });
+            
+            // Poblar AGRUPACION
+            const selectAgrupacion = document.getElementById('filterAgrupacion');
+            selectAgrupacion.innerHTML = '<option value="">Todas las agrupaciones</option>';
+            uniqueValuesProyectos.agrupaciones.forEach(value => {
+                const option = document.createElement('option');
+                option.value = value;
+                option.textContent = value;
+                selectAgrupacion.appendChild(option);
+            });
+        }
+
         function switchTab(tabId) {
             // Actualizar clases de las pestañas
             document.getElementById('tabHoja1').classList.remove('active');
             document.getElementById('tabHoja3').classList.remove('active');
+            document.getElementById('tabProyectos').classList.remove('active');
             document.getElementById('hoja1Content').classList.remove('active');
             document.getElementById('hoja3Content').classList.remove('active');
+            document.getElementById('proyectosContent').classList.remove('active');
             
-            document.getElementById(`tab${tabId.charAt(0).toUpperCase() + tabId.slice(1)}`).classList.add('active');
+            let tabElementId;
+            if (tabId === 'hoja1') {
+                tabElementId = 'tabHoja1';
+            } else if (tabId === 'hoja3') {
+                tabElementId = 'tabHoja3';
+            } else {
+                tabElementId = 'tabProyectos';
+            }
+            
+            document.getElementById(tabElementId).classList.add('active');
             document.getElementById(`${tabId}Content`).classList.add('active');
             
             currentSheet = tabId;
@@ -1285,8 +1424,10 @@
         function displayCurrentSheet() {
             if (currentSheet === 'hoja1') {
                 displayDataHoja1();
-            } else {
+            } else if (currentSheet === 'hoja3') {
                 displayDataHoja3();
+            } else {
+                displayDataProyectos();
             }
         }
 
@@ -1390,11 +1531,63 @@
             }
         }
 
+        function displayDataProyectos() {
+            const container = document.getElementById('excelContentProyectos');
+            
+            if (!filteredDataProyectos || filteredDataProyectos.length === 0) {
+                container.innerHTML = '<div class="error">No se encontraron datos con los filtros aplicados</div>';
+                if (currentSheet === 'proyectos') {
+                    document.getElementById('stats').style.display = 'none';
+                    document.getElementById('pagination').innerHTML = '';
+                }
+                return;
+            }
+            
+            const rowsPerPageValue = rowsPerPage === 'all' ? filteredDataProyectos.length : rowsPerPage;
+            const startIndex = (currentPageProyectos - 1) * rowsPerPageValue;
+            const endIndex = Math.min(startIndex + rowsPerPageValue, filteredDataProyectos.length);
+            const pageData = filteredDataProyectos.slice(startIndex, endIndex);
+            
+            let tableHTML = '<div class="excel-container"><table><thead><tr>';
+            
+            headersProyectos.forEach(header => {
+                const headerText = header && header.toString().trim() !== '' ? header : 'Columna';
+                tableHTML += `<th>${headerText}</th>`;
+            });
+            tableHTML += '</tr></thead><tbody>';
+            
+            pageData.forEach(row => {
+                tableHTML += '<tr>';
+                const rowData = [...row];
+                while (rowData.length < headersProyectos.length) {
+                    rowData.push('');
+                }
+                
+                rowData.forEach(cell => {
+                    const value = cell !== undefined && cell !== null ? cell : '';
+                    tableHTML += `<td>${value}</td>`;
+                });
+                tableHTML += '</tr>';
+            });
+            
+            tableHTML += '</tbody></table></div>';
+            
+            container.innerHTML = tableHTML;
+            
+            if (currentSheet === 'proyectos') {
+                document.getElementById('stats').style.display = 'flex';
+                updateStatsProyectos();
+                updatePaginationProyectos(rowsPerPageValue);
+            }
+        }
+
         function applyFilters(sheet) {
             if (sheet === 'hoja1') {
                 applyFiltersHoja1();
-            } else {
+            } else if (sheet === 'hoja3') {
                 applyFiltersHoja3();
+            } else {
+                applyFiltersProyectos();
             }
         }
 
@@ -1440,7 +1633,7 @@
             currentPageHoja1 = 1;
             if (currentSheet === 'hoja1') {
                 displayDataHoja1();
-                updateTipoGrillaCounters(); // Actualizar contadores después de aplicar filtros
+                updateTipoGrillaCounters();
             }
         }
 
@@ -1500,6 +1693,38 @@
             }
         }
 
+        function applyFiltersProyectos() {
+            const proyectoFilter = document.getElementById('filterProyectoPG').value;
+            const agrupacionFilter = document.getElementById('filterAgrupacion').value;
+            const searchTerm = document.getElementById('searchInputProyectos').value.toLowerCase().trim();
+            
+            filteredDataProyectos = allDataProyectos.filter(row => {
+                if (proyectoFilter && columnIndicesProyectos.proyecto !== -1) {
+                    const rowValue = row[columnIndicesProyectos.proyecto] ? row[columnIndicesProyectos.proyecto].toString() : '';
+                    if (rowValue !== proyectoFilter) return false;
+                }
+                
+                if (agrupacionFilter && columnIndicesProyectos.agrupacion !== -1) {
+                    const rowValue = row[columnIndicesProyectos.agrupacion] ? row[columnIndicesProyectos.agrupacion].toString() : '';
+                    if (rowValue !== agrupacionFilter) return false;
+                }
+                
+                if (searchTerm) {
+                    return row.some(cell => {
+                        if (cell === null || cell === undefined) return false;
+                        return cell.toString().toLowerCase().includes(searchTerm);
+                    });
+                }
+                
+                return true;
+            });
+            
+            currentPageProyectos = 1;
+            if (currentSheet === 'proyectos') {
+                displayDataProyectos();
+            }
+        }
+
         function clearFilters(sheet) {
             if (sheet === 'hoja1') {
                 document.getElementById('filterTipoGrilla').value = '';
@@ -1517,9 +1742,9 @@
                 currentPageHoja1 = 1;
                 if (currentSheet === 'hoja1') {
                     displayDataHoja1();
-                    updateTipoGrillaCounters(); // Actualizar contadores después de limpiar filtros
+                    updateTipoGrillaCounters();
                 }
-            } else {
+            } else if (sheet === 'hoja3') {
                 document.getElementById('filterHC').value = '';
                 document.getElementById('filterProyecto3').value = '';
                 document.getElementById('filterActividad3').value = '';
@@ -1533,10 +1758,20 @@
                 if (currentSheet === 'hoja3') {
                     displayDataHoja3();
                 }
+            } else {
+                document.getElementById('filterProyectoPG').value = '';
+                document.getElementById('filterAgrupacion').value = '';
+                document.getElementById('searchInputProyectos').value = '';
+                
+                filteredDataProyectos = [...allDataProyectos];
+                currentPageProyectos = 1;
+                if (currentSheet === 'proyectos') {
+                    displayDataProyectos();
+                }
             }
         }
 
-        // Función corregida para actualizar contadores usando datos filtrados
+        // Función para actualizar contadores usando datos filtrados
         function updateTipoGrillaCounters() {
             const countersGrid = document.getElementById('tipoGrillaCountersGrid');
             const selectedTipoGrilla = document.getElementById('filterTipoGrilla').value;
@@ -1632,6 +1867,24 @@
                 activeFilters.join(', ') : 'Sin filtros';
         }
 
+        function updateStatsProyectos() {
+            document.getElementById('rowCount').textContent = `${filteredDataProyectos.length} de ${allDataProyectos.length}`;
+            document.getElementById('columnCount').textContent = headersProyectos.length;
+            document.getElementById('exportCount').textContent = `Exportando: ${filteredDataProyectos.length} registros`;
+            
+            const proyectoFilter = document.getElementById('filterProyectoPG').value;
+            const agrupacionFilter = document.getElementById('filterAgrupacion').value;
+            const searchTerm = document.getElementById('searchInputProyectos').value;
+            
+            const activeFilters = [];
+            if (proyectoFilter) activeFilters.push('Proyecto');
+            if (agrupacionFilter) activeFilters.push('Agrupación');
+            if (searchTerm) activeFilters.push('Búsqueda');
+            
+            document.getElementById('filterStatus').textContent = activeFilters.length > 0 ? 
+                activeFilters.join(', ') : 'Sin filtros';
+        }
+
         function updatePaginationHoja1(rowsPerPage) {
             const totalPages = Math.ceil(filteredDataHoja1.length / rowsPerPage);
             const paginationDiv = document.getElementById('pagination');
@@ -1720,13 +1973,60 @@
             paginationDiv.innerHTML = paginationHTML;
         }
 
+        function updatePaginationProyectos(rowsPerPage) {
+            const totalPages = Math.ceil(filteredDataProyectos.length / rowsPerPage);
+            const paginationDiv = document.getElementById('pagination');
+            
+            if (totalPages <= 1) {
+                paginationDiv.innerHTML = '';
+                return;
+            }
+            
+            let paginationHTML = '';
+            
+            paginationHTML += `<button class="page-btn" onclick="changePage(${currentPageProyectos - 1})" ${currentPageProyectos === 1 ? 'disabled' : ''}>Anterior</button>`;
+            
+            const maxButtons = 5;
+            let startPage = Math.max(1, currentPageProyectos - Math.floor(maxButtons / 2));
+            let endPage = Math.min(totalPages, startPage + maxButtons - 1);
+            
+            if (endPage - startPage + 1 < maxButtons) {
+                startPage = Math.max(1, endPage - maxButtons + 1);
+            }
+            
+            if (startPage > 1) {
+                paginationHTML += `<button class="page-btn" onclick="changePage(1)">1</button>`;
+                if (startPage > 2) {
+                    paginationHTML += `<span class="page-btn" style="border: none; background: none;">...</span>`;
+                }
+            }
+            
+            for (let i = startPage; i <= endPage; i++) {
+                paginationHTML += `<button class="page-btn ${i === currentPageProyectos ? 'active' : ''}" onclick="changePage(${i})">${i}</button>`;
+            }
+            
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) {
+                    paginationHTML += `<span class="page-btn" style="border: none; background: none;">...</span>`;
+                }
+                paginationHTML += `<button class="page-btn" onclick="changePage(${totalPages})">${totalPages}</button>`;
+            }
+            
+            paginationHTML += `<button class="page-btn" onclick="changePage(${currentPageProyectos + 1})" ${currentPageProyectos === totalPages ? 'disabled' : ''}>Siguiente</button>`;
+            
+            paginationDiv.innerHTML = paginationHTML;
+        }
+
         function changePage(page) {
             if (currentSheet === 'hoja1') {
                 currentPageHoja1 = page;
                 displayDataHoja1();
-            } else {
+            } else if (currentSheet === 'hoja3') {
                 currentPageHoja3 = page;
                 displayDataHoja3();
+            } else {
+                currentPageProyectos = page;
+                displayDataProyectos();
             }
         }
 
@@ -1737,17 +2037,22 @@
             if (currentSheet === 'hoja1') {
                 currentPageHoja1 = 1;
                 displayDataHoja1();
-            } else {
+            } else if (currentSheet === 'hoja3') {
                 currentPageHoja3 = 1;
                 displayDataHoja3();
+            } else {
+                currentPageProyectos = 1;
+                displayDataProyectos();
             }
         }
 
         function showError(message) {
             const container1 = document.getElementById('excelContentHoja1');
             const container3 = document.getElementById('excelContentHoja3');
+            const containerP = document.getElementById('excelContentProyectos');
             container1.innerHTML = `<div class="error">${message}</div>`;
             container3.innerHTML = `<div class="error">${message}</div>`;
+            containerP.innerHTML = `<div class="error">${message}</div>`;
             document.getElementById('stats').style.display = 'none';
             document.getElementById('pagination').innerHTML = '';
         }
@@ -1759,9 +2064,12 @@
             if (currentSheet === 'hoja1') {
                 dataToExport = filteredDataHoja1;
                 sheetName = 'Actividades_en_grilla';
-            } else {
+            } else if (currentSheet === 'hoja3') {
                 dataToExport = filteredDataHoja3;
                 sheetName = 'Avances_actividades';
+            } else {
+                dataToExport = filteredDataProyectos;
+                sheetName = 'Proyectos_Grilla';
             }
             
             if (dataToExport.length === 0) {
@@ -1770,7 +2078,7 @@
             }
             
             try {
-                const headers = currentSheet === 'hoja1' ? headersHoja1 : headersHoja3;
+                const headers = currentSheet === 'hoja1' ? headersHoja1 : (currentSheet === 'hoja3' ? headersHoja3 : headersProyectos);
                 const exportHeaders = headers.map(h => h || 'Columna');
                 const exportData = [exportHeaders, ...dataToExport];
                 
@@ -1809,6 +2117,7 @@
         // Eventos de búsqueda con debounce
         let searchTimeoutHoja1;
         let searchTimeoutHoja3;
+        let searchTimeoutProyectos;
         
         document.getElementById('searchInputHoja1').addEventListener('input', function(e) {
             clearTimeout(searchTimeoutHoja1);
@@ -1824,6 +2133,15 @@
             searchTimeoutHoja3 = setTimeout(() => {
                 if (currentSheet === 'hoja3') {
                     applyFiltersHoja3();
+                }
+            }, 300);
+        });
+
+        document.getElementById('searchInputProyectos').addEventListener('input', function(e) {
+            clearTimeout(searchTimeoutProyectos);
+            searchTimeoutProyectos = setTimeout(() => {
+                if (currentSheet === 'proyectos') {
+                    applyFiltersProyectos();
                 }
             }, 300);
         });
