@@ -236,11 +236,14 @@
             align-items: center;
             gap: 8px;
             transition: all 0.2s;
+            cursor: pointer;
         }
 
         .counter-card:hover {
             background: #eef2f7;
             border-color: #a0b8cc;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
         .counter-card.active {
@@ -513,19 +516,19 @@
             <span class="file-info" id="fileInfo">Cargando archivo...</span>
         </div>
         
-        <!-- Pestañas -->
+        <!-- Pestañas con nuevos nombres -->
         <div class="tabs">
-            <div class="tab active" onclick="switchTab('hoja1')" id="tabHoja1">Actividades alistamiento</div>
-            <div class="tab" onclick="switchTab('hoja3')" id="tabHoja3">Actividades de grilla</div>
+            <div class="tab active" onclick="switchTab('hoja1')" id="tabHoja1">Actividades en grilla</div>
+            <div class="tab" onclick="switchTab('hoja3')" id="tabHoja3">Avances de actividades</div>
         </div>
         
-        <!-- Contenido Hoja 1 - Actividades alistamiento -->
+        <!-- Contenido Hoja 1 - Actividades en grilla -->
         <div id="hoja1Content" class="tab-content active">
-            <!-- Filtros específicos Hoja 1 con nuevo filtro TIPO GRILLA -->
+            <!-- Filtros específicos Hoja 1 -->
             <div class="filters-section">
-                <div class="filters-title">Filtros de búsqueda - Actividades alistamiento</div>
+                <div class="filters-title">Filtros de búsqueda - Actividades en grilla</div>
                 <div class="filters-grid">
-                    <!-- Nuevo filtro TIPO GRILLA -->
+                    <!-- Filtro TIPO GRILLA -->
                     <div class="filter-group">
                         <label for="filterTipoGrilla">TIPO GRILLA</label>
                         <select id="filterTipoGrilla" class="filter-select" onchange="onTipoGrillaChange()">
@@ -533,7 +536,7 @@
                         </select>
                     </div>
                     
-                    <!-- PROYECTO (siempre habilitado, pero filtrado por TIPO GRILLA si está seleccionado) -->
+                    <!-- PROYECTO (filtro principal) -->
                     <div class="filter-group">
                         <label for="filterProyecto">PROYECTO</label>
                         <select id="filterProyecto" class="filter-select" onchange="onProyectoChange()">
@@ -541,7 +544,7 @@
                         </select>
                     </div>
                     
-                    <!-- COMPONENTE (siempre habilitado, pero filtrado por PROYECTO y TIPO GRILLA) -->
+                    <!-- COMPONENTE (dependiente de PROYECTO) -->
                     <div class="filter-group">
                         <label for="filterComponente">COMPONENTE</label>
                         <select id="filterComponente" class="filter-select" onchange="onComponenteChange()">
@@ -549,7 +552,7 @@
                         </select>
                     </div>
                     
-                    <!-- ACTIVIDAD ALISTAMIENTO (siempre habilitado, pero filtrada por COMPONENTE, PROYECTO y TIPO GRILLA) -->
+                    <!-- ACTIVIDAD ALISTAMIENTO (dependiente de COMPONENTE y PROYECTO) -->
                     <div class="filter-group">
                         <label for="filterActividad">ACTIVIDAD ALISTAMIENTO</label>
                         <select id="filterActividad" class="filter-select">
@@ -585,11 +588,11 @@
             </div>
         </div>
         
-        <!-- Contenido Hoja 3 - Actividades de grilla -->
+        <!-- Contenido Hoja 3 - Avances de actividades -->
         <div id="hoja3Content" class="tab-content">
             <!-- Filtros específicos Hoja 3 -->
             <div class="filters-section">
-                <div class="filters-title">Filtros de búsqueda - Actividades de grilla</div>
+                <div class="filters-title">Filtros de búsqueda - Avances de actividades</div>
                 <div class="filters-grid">
                     <div class="filter-group">
                         <label for="filterHC">HC</label>
@@ -688,13 +691,13 @@
     <script>
         let workbook = null;
         
-        // Estados para Hoja 1 - Actividades alistamiento
+        // Estados para Hoja 1 - Actividades en grilla
         let allDataHoja1 = [];
         let headersHoja1 = [];
         let filteredDataHoja1 = [];
         let currentPageHoja1 = 1;
         
-        // Estados para Hoja 3 - Actividades de grilla
+        // Estados para Hoja 3 - Avances de actividades
         let allDataHoja3 = [];
         let headersHoja3 = [];
         let filteredDataHoja3 = [];
@@ -704,7 +707,7 @@
         let currentSheet = 'hoja1';
         let rowsPerPage = 20;
         
-        // Datos originales para filtros dependientes Hoja 1 (ahora incluye TIPO GRILLA)
+        // Datos originales para filtros dependientes Hoja 1
         let uniqueValuesHoja1 = {
             tipoGrilla: [],
             proyectos: [],
@@ -717,7 +720,7 @@
         let tipoGrillaComponentes = new Map(); // TipoGrilla -> Set de componentes
         let tipoGrillaActividades = new Map(); // TipoGrilla -> Set de actividades
         
-        // Relaciones existentes (ahora filtradas por tipoGrilla cuando sea necesario)
+        // Relaciones de dependencia PROYECTO -> COMPONENTE
         let proyectoComponentes = new Map(); // Proyecto -> Set de componentes
         let componenteActividades = new Map(); // Componente -> Set de actividades
         let proyectoActividades = new Map(); // Proyecto -> Set de actividades
@@ -732,7 +735,7 @@
             componentes: []
         };
         
-        // Mapeo de índices de columnas Hoja 1 (agregamos TIPO GRILLA)
+        // Mapeo de índices de columnas Hoja 1
         let columnIndicesHoja1 = {
             tipoGrilla: -1,
             proyecto: -1,
@@ -764,12 +767,12 @@
                 // Leer el workbook completo
                 workbook = XLSX.read(data, {type: 'array'});
                 
-                // Cargar Hoja1 si existe (Actividades alistamiento)
+                // Cargar Hoja1 si existe (Actividades en grilla)
                 if (workbook.SheetNames.includes('Hoja1')) {
                     loadSheet('Hoja1', 'hoja1');
                 }
                 
-                // Cargar Hoja3 si existe (Actividades de grilla)
+                // Cargar Hoja3 si existe (Avances de actividades)
                 if (workbook.SheetNames.includes('Hoja3')) {
                     loadSheet('Hoja3', 'hoja3');
                 }
@@ -814,7 +817,7 @@
                         allDataHoja1 = data;
                         filteredDataHoja1 = [...allDataHoja1];
                         
-                        // Identificar índices de las columnas Hoja 1 (incluyendo TIPO GRILLA)
+                        // Identificar índices de las columnas Hoja 1
                         headers.forEach((header, index) => {
                             const headerStr = (header || '').toString().toUpperCase().trim();
                             if (headerStr.includes('TIPO GRILLA') || headerStr.includes('TIPO_GRILLA') || headerStr.includes('TIPO-GRILLA')) {
@@ -911,7 +914,7 @@
             uniqueValuesHoja1.actividades = Array.from(actividadesSet).sort();
             uniqueValuesHoja1.componentes = Array.from(componentesSet).sort();
             
-            // Segunda pasada: construir relaciones incluyendo TIPO GRILLA
+            // Segunda pasada: construir relaciones
             allDataHoja1.forEach(row => {
                 const tipoGrilla = row[columnIndicesHoja1.tipoGrilla] ? row[columnIndicesHoja1.tipoGrilla].toString().trim() : '';
                 const proyecto = row[columnIndicesHoja1.proyecto] ? row[columnIndicesHoja1.proyecto].toString().trim() : '';
@@ -940,7 +943,7 @@
                     tipoGrillaActividades.get(tipoGrilla).add(actividad);
                 }
                 
-                // Relaciones existentes
+                // Relación PROYECTO -> COMPONENTE (dependencia principal)
                 if (proyecto && componente) {
                     if (!proyectoComponentes.has(proyecto)) {
                         proyectoComponentes.set(proyecto, new Set());
@@ -948,6 +951,7 @@
                     proyectoComponentes.get(proyecto).add(componente);
                 }
                 
+                // Relación COMPONENTE -> ACTIVIDAD
                 if (componente && actividad) {
                     if (!componenteActividades.has(componente)) {
                         componenteActividades.set(componente, new Set());
@@ -955,6 +959,7 @@
                     componenteActividades.get(componente).add(actividad);
                 }
                 
+                // Relación PROYECTO -> ACTIVIDAD (para filtrado combinado)
                 if (proyecto && actividad) {
                     if (!proyectoActividades.has(proyecto)) {
                         proyectoActividades.set(proyecto, new Set());
@@ -1023,14 +1028,14 @@
                 selectTipoGrilla.appendChild(option);
             });
             
-            // Poblar PROYECTO con todos los proyectos inicialmente
+            // Poblar PROYECTO
             updateProyectosFilter();
             
-            // Poblar COMPONENTE con todos los componentes inicialmente
+            // Poblar COMPONENTE (inicialmente todos, pero se actualizará al seleccionar proyecto)
             updateComponentesFilter();
             
-            // Poblar ACTIVIDAD con todas las actividades inicialmente
-            updateActividadesFilter('', '', '');
+            // Poblar ACTIVIDAD
+            updateActividadesFilter();
         }
 
         function populateFiltersHoja3() {
@@ -1116,7 +1121,7 @@
         function onTipoGrillaChange() {
             const selectedTipoGrilla = document.getElementById('filterTipoGrilla').value;
             
-            // Actualizar proyectos según el tipo de grilla seleccionado
+            // Actualizar proyectos según el tipo de grilla
             updateProyectosFilter(selectedTipoGrilla);
             
             // Actualizar componentes según el tipo de grilla y proyecto seleccionado
@@ -1135,7 +1140,7 @@
             const selectedTipoGrilla = document.getElementById('filterTipoGrilla').value;
             const selectedProyecto = document.getElementById('filterProyecto').value;
             
-            // Actualizar componentes según el proyecto y tipo de grilla seleccionados
+            // Actualizar componentes según el proyecto seleccionado (dependencia principal)
             updateComponentesFilter(selectedTipoGrilla, selectedProyecto);
             
             // Actualizar actividades según todos los filtros
@@ -1148,7 +1153,7 @@
             const selectedProyecto = document.getElementById('filterProyecto').value;
             const selectedComponente = document.getElementById('filterComponente').value;
             
-            // Actualizar actividades según el componente y otros filtros
+            // Actualizar actividades según el componente seleccionado
             updateActividadesFilter(selectedTipoGrilla, selectedProyecto, selectedComponente);
         }
 
@@ -1159,7 +1164,7 @@
             let proyectosArray = [];
             
             if (tipoGrilla) {
-                // Si hay tipo de grilla seleccionado, mostrar solo proyectos de ese tipo
+                // Si hay tipo de grilla, mostrar proyectos de ese tipo
                 const proyectosDelTipo = tipoGrillaProyectos.get(tipoGrilla) || new Set();
                 proyectosArray = Array.from(proyectosDelTipo).sort();
             } else {
@@ -1183,26 +1188,32 @@
             const selectComponente = document.getElementById('filterComponente');
             const currentComponente = selectComponente.value;
             
-            let componentesArray = new Set();
+            let componentesSet = new Set();
             
+            // Primero, aplicar dependencia de PROYECTO (prioridad principal)
             if (proyecto) {
-                // Si hay proyecto seleccionado, obtener componentes de ese proyecto
                 const componentesDelProyecto = proyectoComponentes.get(proyecto) || new Set();
-                componentesArray = new Set([...componentesArray, ...componentesDelProyecto]);
+                componentesSet = new Set([...componentesSet, ...componentesDelProyecto]);
             }
             
+            // Luego, filtrar por tipo de grilla si está seleccionado
             if (tipoGrilla) {
-                // Si hay tipo de grilla seleccionado, obtener componentes de ese tipo
                 const componentesDelTipo = tipoGrillaComponentes.get(tipoGrilla) || new Set();
-                componentesArray = new Set([...componentesArray, ...componentesDelTipo]);
+                if (componentesSet.size > 0) {
+                    // Si ya hay componentes por proyecto, hacer intersección
+                    componentesSet = new Set([...componentesSet].filter(comp => componentesDelTipo.has(comp)));
+                } else {
+                    // Si no hay proyecto, usar componentes del tipo
+                    componentesSet = new Set([...componentesSet, ...componentesDelTipo]);
+                }
             }
             
             // Si no hay filtros, mostrar todos los componentes
             if (!proyecto && !tipoGrilla) {
-                componentesArray = new Set(uniqueValuesHoja1.componentes);
+                componentesSet = new Set(uniqueValuesHoja1.componentes);
             }
             
-            const componentesOrdenados = Array.from(componentesArray).sort();
+            const componentesOrdenados = Array.from(componentesSet).sort();
             
             selectComponente.innerHTML = '<option value="">Todos los componentes</option>';
             componentesOrdenados.forEach(value => {
@@ -1220,32 +1231,44 @@
             const selectActividad = document.getElementById('filterActividad');
             const currentActividad = selectActividad.value;
             
-            let actividadesArray = new Set();
+            let actividadesSet = new Set();
             
+            // Primero, aplicar dependencia de COMPONENTE (prioridad máxima)
             if (componente) {
-                // Actividades del componente
                 const actividadesDelComponente = componenteActividades.get(componente) || new Set();
-                actividadesArray = new Set([...actividadesArray, ...actividadesDelComponente]);
+                actividadesSet = new Set([...actividadesSet, ...actividadesDelComponente]);
             }
             
+            // Luego, filtrar por proyecto si está seleccionado
             if (proyecto) {
-                // Actividades del proyecto
                 const actividadesDelProyecto = proyectoActividades.get(proyecto) || new Set();
-                actividadesArray = new Set([...actividadesArray, ...actividadesDelProyecto]);
+                if (actividadesSet.size > 0) {
+                    // Si ya hay actividades por componente, hacer intersección
+                    actividadesSet = new Set([...actividadesSet].filter(act => actividadesDelProyecto.has(act)));
+                } else {
+                    // Si no hay componente, usar actividades del proyecto
+                    actividadesSet = new Set([...actividadesSet, ...actividadesDelProyecto]);
+                }
             }
             
+            // Finalmente, filtrar por tipo de grilla
             if (tipoGrilla) {
-                // Actividades del tipo de grilla
                 const actividadesDelTipo = tipoGrillaActividades.get(tipoGrilla) || new Set();
-                actividadesArray = new Set([...actividadesArray, ...actividadesDelTipo]);
+                if (actividadesSet.size > 0) {
+                    // Si ya hay actividades, hacer intersección
+                    actividadesSet = new Set([...actividadesSet].filter(act => actividadesDelTipo.has(act)));
+                } else {
+                    // Si no hay otros filtros, usar actividades del tipo
+                    actividadesSet = new Set([...actividadesSet, ...actividadesDelTipo]);
+                }
             }
             
             // Si no hay filtros, mostrar todas las actividades
             if (!componente && !proyecto && !tipoGrilla) {
-                actividadesArray = new Set(uniqueValuesHoja1.actividades);
+                actividadesSet = new Set(uniqueValuesHoja1.actividades);
             }
             
-            const actividadesOrdenadas = Array.from(actividadesArray).sort();
+            const actividadesOrdenadas = Array.from(actividadesSet).sort();
             
             selectActividad.innerHTML = '<option value="">Todas las actividades</option>';
             actividadesOrdenadas.forEach(value => {
@@ -1480,6 +1503,9 @@
         function clearFilters(sheet) {
             if (sheet === 'hoja1') {
                 document.getElementById('filterTipoGrilla').value = '';
+                document.getElementById('filterProyecto').value = '';
+                document.getElementById('filterComponente').innerHTML = '<option value="">Todos los componentes</option>';
+                document.getElementById('filterActividad').innerHTML = '<option value="">Todas las actividades</option>';
                 document.getElementById('searchInputHoja1').value = '';
                 
                 // Restaurar todos los filtros
@@ -1722,10 +1748,10 @@
             
             if (currentSheet === 'hoja1') {
                 dataToExport = filteredDataHoja1;
-                sheetName = 'Actividades_alistamiento';
+                sheetName = 'Actividades_en_grilla';
             } else {
                 dataToExport = filteredDataHoja3;
-                sheetName = 'Actividades_grilla';
+                sheetName = 'Avances_actividades';
             }
             
             if (dataToExport.length === 0) {
