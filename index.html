@@ -44,6 +44,48 @@
             font-weight: 400;
         }
 
+        /* Estilos para las pestañas */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #eef2f7;
+            padding-bottom: 10px;
+        }
+
+        .tab {
+            padding: 12px 30px;
+            background: #f8fafd;
+            border: 1px solid #e9ecf0;
+            border-radius: 8px 8px 0 0;
+            cursor: pointer;
+            font-weight: 500;
+            color: #5d6d7e;
+            transition: all 0.2s;
+            font-size: 15px;
+            margin-bottom: -2px;
+        }
+
+        .tab:hover {
+            background: #eef2f7;
+            color: #2c3e50;
+        }
+
+        .tab.active {
+            background: white;
+            color: #2c3e50;
+            border-bottom: 3px solid #2c3e50;
+            font-weight: 600;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
         .filters-section {
             background: #f8fafd;
             border-radius: 8px;
@@ -63,7 +105,7 @@
 
         .filters-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 20px;
             margin-bottom: 20px;
         }
@@ -383,57 +425,132 @@
     <div class="container">
         <h1>Actividades de grilla para alistamiento, Sucursal Bogotá</h1>
         <div class="subtitle">
-            Visualización de datos - Hoja1
+            Visualización de datos
             <span class="file-info" id="fileInfo">Cargando archivo...</span>
         </div>
         
-        <!-- Filtros específicos - Reordenados: PROYECTO, COMPONENTE, ACTIVIDAD -->
-        <div class="filters-section">
-            <div class="filters-title">Filtros de búsqueda</div>
-            <div class="filters-grid">
-                <!-- Primero: PROYECTO -->
-                <div class="filter-group">
-                    <label for="filterProyecto">PROYECTO</label>
-                    <select id="filterProyecto" class="filter-select" onchange="onProyectoChange()">
-                        <option value="">Todos los proyectos</option>
-                    </select>
+        <!-- Pestañas -->
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('hoja1')" id="tabHoja1">Hoja 1</div>
+            <div class="tab" onclick="switchTab('hoja3')" id="tabHoja3">Hoja 3</div>
+        </div>
+        
+        <!-- Contenido Hoja 1 -->
+        <div id="hoja1Content" class="tab-content active">
+            <!-- Filtros específicos Hoja 1 -->
+            <div class="filters-section">
+                <div class="filters-title">Filtros de búsqueda - Hoja 1</div>
+                <div class="filters-grid">
+                    <div class="filter-group">
+                        <label for="filterProyecto">PROYECTO</label>
+                        <select id="filterProyecto" class="filter-select" onchange="onProyectoChange()">
+                            <option value="">Todos los proyectos</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="filterComponente">COMPONENTE</label>
+                        <select id="filterComponente" class="filter-select" onchange="onComponenteChange()">
+                            <option value="">Todos los componentes</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="filterActividad">ACTIVIDAD ALISTAMIENTO</label>
+                        <select id="filterActividad" class="filter-select">
+                            <option value="">Todas las actividades</option>
+                        </select>
+                    </div>
                 </div>
                 
-                <!-- Segundo: COMPONENTE (ahora va antes que actividad) -->
-                <div class="filter-group">
-                    <label for="filterComponente">COMPONENTE</label>
-                    <select id="filterComponente" class="filter-select" onchange="onComponenteChange()">
-                        <option value="">Todos los componentes</option>
-                    </select>
-                </div>
-                
-                <!-- Tercero: ACTIVIDAD ALISTAMIENTO (depende de componente) -->
-                <div class="filter-group">
-                    <label for="filterActividad">ACTIVIDAD ALISTAMIENTO</label>
-                    <select id="filterActividad" class="filter-select">
-                        <option value="">Todas las actividades</option>
-                    </select>
+                <div class="filter-actions">
+                    <button class="btn btn-secondary" onclick="clearFilters('hoja1')">Limpiar filtros</button>
+                    <button class="btn btn-primary" onclick="applyFilters('hoja1')">Aplicar filtros</button>
                 </div>
             </div>
             
-            <div class="filter-actions">
-                <button class="btn btn-secondary" onclick="clearFilters()">Limpiar filtros</button>
-                <button class="btn btn-primary" onclick="applyFilters()">Aplicar filtros</button>
+            <!-- Búsqueda global Hoja 1 -->
+            <div class="search-box">
+                <input type="text" class="search-input" id="searchInputHoja1" placeholder="Búsqueda general en todos los campos...">
+            </div>
+            
+            <div id="excelContentHoja1">
+                <div class="loading">
+                    <div>Cargando archivo Excel...</div>
+                    <div class="spinner"></div>
+                </div>
             </div>
         </div>
         
-        <!-- Búsqueda global -->
-        <div class="search-box">
-            <input type="text" class="search-input" id="searchInput" placeholder="Búsqueda general en todos los campos...">
-        </div>
-        
-        <div id="excelContent">
-            <div class="loading">
-                <div>Cargando archivo Excel...</div>
-                <div class="spinner"></div>
+        <!-- Contenido Hoja 3 -->
+        <div id="hoja3Content" class="tab-content">
+            <!-- Filtros específicos Hoja 3 -->
+            <div class="filters-section">
+                <div class="filters-title">Filtros de búsqueda - Hoja 3</div>
+                <div class="filters-grid">
+                    <div class="filter-group">
+                        <label for="filterHC">HC</label>
+                        <select id="filterHC" class="filter-select">
+                            <option value="">Todos los HC</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="filterProyecto3">PROYECTO</label>
+                        <select id="filterProyecto3" class="filter-select">
+                            <option value="">Todos los proyectos</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="filterActividad3">ACTIVIDAD</label>
+                        <select id="filterActividad3" class="filter-select">
+                            <option value="">Todas las actividades</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="filterTipo">TIPO</label>
+                        <select id="filterTipo" class="filter-select">
+                            <option value="">Todos los tipos</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="filterSucursal">SUCURSAL</label>
+                        <select id="filterSucursal" class="filter-select">
+                            <option value="">Todas las sucursales</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="filterComponente3">COMPONENTE</label>
+                        <select id="filterComponente3" class="filter-select">
+                            <option value="">Todos los componentes</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="filter-actions">
+                    <button class="btn btn-secondary" onclick="clearFilters('hoja3')">Limpiar filtros</button>
+                    <button class="btn btn-primary" onclick="applyFilters('hoja3')">Aplicar filtros</button>
+                </div>
+            </div>
+            
+            <!-- Búsqueda global Hoja 3 -->
+            <div class="search-box">
+                <input type="text" class="search-input" id="searchInputHoja3" placeholder="Búsqueda general en todos los campos...">
+            </div>
+            
+            <div id="excelContentHoja3">
+                <div class="loading">
+                    <div>Cargando archivo Excel...</div>
+                    <div class="spinner"></div>
+                </div>
             </div>
         </div>
         
+        <!-- Estadísticas y exportación (compartidas) -->
         <div class="stats" id="stats" style="display: none;">
             <div class="stats-left">
                 <div class="stat-item">Registros: <span class="stat-value" id="rowCount"></span></div>
@@ -465,28 +582,59 @@
 
     <script>
         let workbook = null;
-        let allData = [];
-        let headers = [];
-        let currentPage = 1;
-        let rowsPerPage = 20;
-        let filteredData = [];
         
-        // Datos originales para filtros dependientes
-        let uniqueValues = {
+        // Estados para Hoja 1
+        let allDataHoja1 = [];
+        let headersHoja1 = [];
+        let filteredDataHoja1 = [];
+        let currentPageHoja1 = 1;
+        
+        // Estados para Hoja 3
+        let allDataHoja3 = [];
+        let headersHoja3 = [];
+        let filteredDataHoja3 = [];
+        let currentPageHoja3 = 1;
+        
+        // Estado compartido
+        let currentSheet = 'hoja1';
+        let rowsPerPage = 20;
+        
+        // Datos originales para filtros dependientes Hoja 1
+        let uniqueValuesHoja1 = {
             proyectos: [],
             actividades: [],
             componentes: []
         };
         
-        // Relaciones para filtros dependientes
-        let proyectoComponentes = new Map(); // Proyecto -> Set de componentes
-        let componenteActividades = new Map(); // Componente -> Set de actividades
-        let proyectoActividades = new Map(); // Proyecto -> Set de actividades (para filtrado combinado)
+        // Relaciones para filtros dependientes Hoja 1
+        let proyectoComponentes = new Map();
+        let componenteActividades = new Map();
+        let proyectoActividades = new Map();
         
-        // Mapeo de índices de columnas
-        let columnIndices = {
+        // Datos para filtros Hoja 3
+        let uniqueValuesHoja3 = {
+            hc: [],
+            proyectos: [],
+            actividades: [],
+            tipos: [],
+            sucursales: [],
+            componentes: []
+        };
+        
+        // Mapeo de índices de columnas Hoja 1
+        let columnIndicesHoja1 = {
             proyecto: -1,
             actividad: -1,
+            componente: -1
+        };
+        
+        // Mapeo de índices de columnas Hoja 3
+        let columnIndicesHoja3 = {
+            hc: -1,
+            proyecto: -1,
+            actividad: -1,
+            tipo: -1,
+            sucursal: -1,
             componente: -1
         };
 
@@ -504,15 +652,20 @@
                 // Leer el workbook completo
                 workbook = XLSX.read(data, {type: 'array'});
                 
-                // Cargar solo la Hoja1
+                // Cargar Hoja1 si existe
                 if (workbook.SheetNames.includes('Hoja1')) {
-                    loadSheet('Hoja1');
-                } else {
-                    // Si no existe Hoja1, cargar la primera hoja disponible
-                    loadSheet(workbook.SheetNames[0]);
+                    loadSheet('Hoja1', 'hoja1');
+                }
+                
+                // Cargar Hoja3 si existe
+                if (workbook.SheetNames.includes('Hoja3')) {
+                    loadSheet('Hoja3', 'hoja3');
                 }
                 
                 document.getElementById('fileInfo').textContent = `✓ Archivo cargado: ${workbook.SheetNames.length} hoja(s) disponible(s)`;
+                
+                // Mostrar la hoja activa
+                displayCurrentSheet();
                 
             } catch (error) {
                 console.error('Error:', error);
@@ -521,13 +674,15 @@
             }
         }
 
-        function loadSheet(sheetName) {
+        function loadSheet(sheetName, targetSheet) {
             if (!workbook) return;
             
             try {
                 const worksheet = workbook.Sheets[sheetName];
                 if (!worksheet) {
-                    showError(`No se encontró la hoja "${sheetName}"`);
+                    if (targetSheet === 'hoja1') {
+                        showError(`No se encontró la hoja "${sheetName}"`);
+                    }
                     return;
                 }
                 
@@ -539,65 +694,94 @@
                 });
                 
                 if (jsonData.length > 0) {
-                    headers = jsonData[0] || [];
-                    allData = jsonData.slice(1).filter(row => row.some(cell => cell !== '' && cell !== null && cell !== undefined));
+                    const headers = jsonData[0] || [];
+                    const data = jsonData.slice(1).filter(row => row.some(cell => cell !== '' && cell !== null && cell !== undefined));
                     
-                    // Identificar índices de las columnas
-                    headers.forEach((header, index) => {
-                        const headerStr = (header || '').toString().toUpperCase().trim();
-                        if (headerStr.includes('PROYECTO')) {
-                            columnIndices.proyecto = index;
-                        } else if (headerStr.includes('ACTIVIDAD') && headerStr.includes('ALISTAMIENTO')) {
-                            columnIndices.actividad = index;
-                        } else if (headerStr.includes('COMPONENTE')) {
-                            columnIndices.componente = index;
-                        }
-                    });
-                    
-                    // Construir relaciones para filtros dependientes
-                    buildDependentFilters();
-                    
-                    filteredData = [...allData];
-                    
-                    // Poblar los filtros iniciales
-                    populateFilters();
-                    
-                    currentPage = 1;
-                    displayData();
-                    updateStats();
+                    if (targetSheet === 'hoja1') {
+                        headersHoja1 = headers;
+                        allDataHoja1 = data;
+                        filteredDataHoja1 = [...allDataHoja1];
+                        
+                        // Identificar índices de las columnas Hoja 1
+                        headers.forEach((header, index) => {
+                            const headerStr = (header || '').toString().toUpperCase().trim();
+                            if (headerStr.includes('PROYECTO')) {
+                                columnIndicesHoja1.proyecto = index;
+                            } else if (headerStr.includes('ACTIVIDAD') && headerStr.includes('ALISTAMIENTO')) {
+                                columnIndicesHoja1.actividad = index;
+                            } else if (headerStr.includes('COMPONENTE')) {
+                                columnIndicesHoja1.componente = index;
+                            }
+                        });
+                        
+                        // Construir relaciones para filtros dependientes Hoja 1
+                        buildDependentFiltersHoja1();
+                        
+                        // Poblar los filtros Hoja 1
+                        populateFiltersHoja1();
+                        
+                    } else if (targetSheet === 'hoja3') {
+                        headersHoja3 = headers;
+                        allDataHoja3 = data;
+                        filteredDataHoja3 = [...allDataHoja3];
+                        
+                        // Identificar índices de las columnas Hoja 3
+                        headers.forEach((header, index) => {
+                            const headerStr = (header || '').toString().toUpperCase().trim();
+                            if (headerStr === 'HC') {
+                                columnIndicesHoja3.hc = index;
+                            } else if (headerStr === 'PROYECTO') {
+                                columnIndicesHoja3.proyecto = index;
+                            } else if (headerStr === 'ACTIVIDAD') {
+                                columnIndicesHoja3.actividad = index;
+                            } else if (headerStr === 'TIPO') {
+                                columnIndicesHoja3.tipo = index;
+                            } else if (headerStr === 'SUCURSAL') {
+                                columnIndicesHoja3.sucursal = index;
+                            } else if (headerStr === 'COMPONENTE') {
+                                columnIndicesHoja3.componente = index;
+                            }
+                        });
+                        
+                        // Construir valores únicos para filtros Hoja 3
+                        buildUniqueValuesHoja3();
+                        
+                        // Poblar los filtros Hoja 3
+                        populateFiltersHoja3();
+                    }
                     
                 } else {
-                    showError(`La hoja "${sheetName}" está vacía`);
+                    if (targetSheet === 'hoja1') {
+                        showError(`La hoja "${sheetName}" está vacía`);
+                    }
                 }
                 
             } catch (error) {
                 console.error('Error al cargar hoja:', error);
-                showError(`Error al procesar la hoja "${sheetName}"`);
+                if (targetSheet === 'hoja1') {
+                    showError(`Error al procesar la hoja "${sheetName}"`);
+                }
             }
         }
 
-        function buildDependentFilters() {
-            // Limpiar maps
+        function buildDependentFiltersHoja1() {
             proyectoComponentes.clear();
             componenteActividades.clear();
             proyectoActividades.clear();
             
-            // Sets para valores únicos
             const proyectosSet = new Set();
             const actividadesSet = new Set();
             const componentesSet = new Set();
             
-            allData.forEach(row => {
-                const proyecto = row[columnIndices.proyecto] ? row[columnIndices.proyecto].toString().trim() : '';
-                const actividad = row[columnIndices.actividad] ? row[columnIndices.actividad].toString().trim() : '';
-                const componente = row[columnIndices.componente] ? row[columnIndices.componente].toString().trim() : '';
+            allDataHoja1.forEach(row => {
+                const proyecto = row[columnIndicesHoja1.proyecto] ? row[columnIndicesHoja1.proyecto].toString().trim() : '';
+                const actividad = row[columnIndicesHoja1.actividad] ? row[columnIndicesHoja1.actividad].toString().trim() : '';
+                const componente = row[columnIndicesHoja1.componente] ? row[columnIndicesHoja1.componente].toString().trim() : '';
                 
-                // Agregar a sets de valores únicos
                 if (proyecto) proyectosSet.add(proyecto);
                 if (actividad) actividadesSet.add(actividad);
                 if (componente) componentesSet.add(componente);
                 
-                // Construir relaciones Proyecto -> Componentes
                 if (proyecto && componente) {
                     if (!proyectoComponentes.has(proyecto)) {
                         proyectoComponentes.set(proyecto, new Set());
@@ -605,7 +789,6 @@
                     proyectoComponentes.get(proyecto).add(componente);
                 }
                 
-                // Construir relaciones Componente -> Actividades
                 if (componente && actividad) {
                     if (!componenteActividades.has(componente)) {
                         componenteActividades.set(componente, new Set());
@@ -613,7 +796,6 @@
                     componenteActividades.get(componente).add(actividad);
                 }
                 
-                // Construir relaciones Proyecto -> Actividades (para filtrado combinado)
                 if (proyecto && actividad) {
                     if (!proyectoActividades.has(proyecto)) {
                         proyectoActividades.set(proyecto, new Set());
@@ -622,37 +804,81 @@
                 }
             });
             
-            // Convertir a arrays ordenados
-            uniqueValues.proyectos = Array.from(proyectosSet).sort();
-            uniqueValues.actividades = Array.from(actividadesSet).sort();
-            uniqueValues.componentes = Array.from(componentesSet).sort();
+            uniqueValuesHoja1.proyectos = Array.from(proyectosSet).sort();
+            uniqueValuesHoja1.actividades = Array.from(actividadesSet).sort();
+            uniqueValuesHoja1.componentes = Array.from(componentesSet).sort();
         }
 
-        function populateFilters() {
-            // Poblar select de Proyectos
+        function buildUniqueValuesHoja3() {
+            const hcSet = new Set();
+            const proyectosSet = new Set();
+            const actividadesSet = new Set();
+            const tiposSet = new Set();
+            const sucursalesSet = new Set();
+            const componentesSet = new Set();
+            
+            allDataHoja3.forEach(row => {
+                if (columnIndicesHoja3.hc !== -1) {
+                    const hc = row[columnIndicesHoja3.hc] ? row[columnIndicesHoja3.hc].toString().trim() : '';
+                    if (hc) hcSet.add(hc);
+                }
+                
+                if (columnIndicesHoja3.proyecto !== -1) {
+                    const proyecto = row[columnIndicesHoja3.proyecto] ? row[columnIndicesHoja3.proyecto].toString().trim() : '';
+                    if (proyecto) proyectosSet.add(proyecto);
+                }
+                
+                if (columnIndicesHoja3.actividad !== -1) {
+                    const actividad = row[columnIndicesHoja3.actividad] ? row[columnIndicesHoja3.actividad].toString().trim() : '';
+                    if (actividad) actividadesSet.add(actividad);
+                }
+                
+                if (columnIndicesHoja3.tipo !== -1) {
+                    const tipo = row[columnIndicesHoja3.tipo] ? row[columnIndicesHoja3.tipo].toString().trim() : '';
+                    if (tipo) tiposSet.add(tipo);
+                }
+                
+                if (columnIndicesHoja3.sucursal !== -1) {
+                    const sucursal = row[columnIndicesHoja3.sucursal] ? row[columnIndicesHoja3.sucursal].toString().trim() : '';
+                    if (sucursal) sucursalesSet.add(sucursal);
+                }
+                
+                if (columnIndicesHoja3.componente !== -1) {
+                    const componente = row[columnIndicesHoja3.componente] ? row[columnIndicesHoja3.componente].toString().trim() : '';
+                    if (componente) componentesSet.add(componente);
+                }
+            });
+            
+            uniqueValuesHoja3.hc = Array.from(hcSet).sort();
+            uniqueValuesHoja3.proyectos = Array.from(proyectosSet).sort();
+            uniqueValuesHoja3.actividades = Array.from(actividadesSet).sort();
+            uniqueValuesHoja3.tipos = Array.from(tiposSet).sort();
+            uniqueValuesHoja3.sucursales = Array.from(sucursalesSet).sort();
+            uniqueValuesHoja3.componentes = Array.from(componentesSet).sort();
+        }
+
+        function populateFiltersHoja1() {
             const selectProyecto = document.getElementById('filterProyecto');
             selectProyecto.innerHTML = '<option value="">Todos los proyectos</option>';
-            uniqueValues.proyectos.forEach(value => {
+            uniqueValuesHoja1.proyectos.forEach(value => {
                 const option = document.createElement('option');
                 option.value = value;
                 option.textContent = value;
                 selectProyecto.appendChild(option);
             });
             
-            // Poblar select de Componentes (inicialmente todos)
             const selectComponente = document.getElementById('filterComponente');
             selectComponente.innerHTML = '<option value="">Todos los componentes</option>';
-            uniqueValues.componentes.forEach(value => {
+            uniqueValuesHoja1.componentes.forEach(value => {
                 const option = document.createElement('option');
                 option.value = value;
                 option.textContent = value;
                 selectComponente.appendChild(option);
             });
             
-            // Poblar select de Actividades (inicialmente todos)
             const selectActividad = document.getElementById('filterActividad');
             selectActividad.innerHTML = '<option value="">Todas las actividades</option>';
-            uniqueValues.actividades.forEach(value => {
+            uniqueValuesHoja1.actividades.forEach(value => {
                 const option = document.createElement('option');
                 option.value = value;
                 option.textContent = value;
@@ -660,14 +886,190 @@
             });
         }
 
+        function populateFiltersHoja3() {
+            const selectHC = document.getElementById('filterHC');
+            selectHC.innerHTML = '<option value="">Todos los HC</option>';
+            uniqueValuesHoja3.hc.forEach(value => {
+                const option = document.createElement('option');
+                option.value = value;
+                option.textContent = value;
+                selectHC.appendChild(option);
+            });
+            
+            const selectProyecto = document.getElementById('filterProyecto3');
+            selectProyecto.innerHTML = '<option value="">Todos los proyectos</option>';
+            uniqueValuesHoja3.proyectos.forEach(value => {
+                const option = document.createElement('option');
+                option.value = value;
+                option.textContent = value;
+                selectProyecto.appendChild(option);
+            });
+            
+            const selectActividad = document.getElementById('filterActividad3');
+            selectActividad.innerHTML = '<option value="">Todas las actividades</option>';
+            uniqueValuesHoja3.actividades.forEach(value => {
+                const option = document.createElement('option');
+                option.value = value;
+                option.textContent = value;
+                selectActividad.appendChild(option);
+            });
+            
+            const selectTipo = document.getElementById('filterTipo');
+            selectTipo.innerHTML = '<option value="">Todos los tipos</option>';
+            uniqueValuesHoja3.tipos.forEach(value => {
+                const option = document.createElement('option');
+                option.value = value;
+                option.textContent = value;
+                selectTipo.appendChild(option);
+            });
+            
+            const selectSucursal = document.getElementById('filterSucursal');
+            selectSucursal.innerHTML = '<option value="">Todas las sucursales</option>';
+            uniqueValuesHoja3.sucursales.forEach(value => {
+                const option = document.createElement('option');
+                option.value = value;
+                option.textContent = value;
+                selectSucursal.appendChild(option);
+            });
+            
+            const selectComponente = document.getElementById('filterComponente3');
+            selectComponente.innerHTML = '<option value="">Todos los componentes</option>';
+            uniqueValuesHoja3.componentes.forEach(value => {
+                const option = document.createElement('option');
+                option.value = value;
+                option.textContent = value;
+                selectComponente.appendChild(option);
+            });
+        }
+
+        function switchTab(tabId) {
+            // Actualizar clases de las pestañas
+            document.getElementById('tabHoja1').classList.remove('active');
+            document.getElementById('tabHoja3').classList.remove('active');
+            document.getElementById('hoja1Content').classList.remove('active');
+            document.getElementById('hoja3Content').classList.remove('active');
+            
+            document.getElementById(`tab${tabId.charAt(0).toUpperCase() + tabId.slice(1)}`).classList.add('active');
+            document.getElementById(`${tabId}Content`).classList.add('active');
+            
+            currentSheet = tabId;
+            displayCurrentSheet();
+        }
+
+        function displayCurrentSheet() {
+            if (currentSheet === 'hoja1') {
+                displayDataHoja1();
+            } else {
+                displayDataHoja3();
+            }
+        }
+
+        function displayDataHoja1() {
+            const container = document.getElementById('excelContentHoja1');
+            
+            if (!filteredDataHoja1 || filteredDataHoja1.length === 0) {
+                container.innerHTML = '<div class="error">No se encontraron datos con los filtros aplicados</div>';
+                if (currentSheet === 'hoja1') {
+                    document.getElementById('stats').style.display = 'none';
+                    document.getElementById('pagination').innerHTML = '';
+                }
+                return;
+            }
+            
+            const rowsPerPageValue = rowsPerPage === 'all' ? filteredDataHoja1.length : rowsPerPage;
+            const startIndex = (currentPageHoja1 - 1) * rowsPerPageValue;
+            const endIndex = Math.min(startIndex + rowsPerPageValue, filteredDataHoja1.length);
+            const pageData = filteredDataHoja1.slice(startIndex, endIndex);
+            
+            let tableHTML = '<div class="excel-container"><table><thead><tr>';
+            
+            headersHoja1.forEach(header => {
+                const headerText = header && header.toString().trim() !== '' ? header : 'Columna';
+                tableHTML += `<th>${headerText}</th>`;
+            });
+            tableHTML += '</tr></thead><tbody>';
+            
+            pageData.forEach(row => {
+                tableHTML += '<tr>';
+                const rowData = [...row];
+                while (rowData.length < headersHoja1.length) {
+                    rowData.push('');
+                }
+                
+                rowData.forEach(cell => {
+                    const value = cell !== undefined && cell !== null ? cell : '';
+                    tableHTML += `<td>${value}</td>`;
+                });
+                tableHTML += '</tr>';
+            });
+            
+            tableHTML += '</tbody></table></div>';
+            
+            container.innerHTML = tableHTML;
+            
+            if (currentSheet === 'hoja1') {
+                document.getElementById('stats').style.display = 'flex';
+                updateStatsHoja1();
+                updatePaginationHoja1(rowsPerPageValue);
+            }
+        }
+
+        function displayDataHoja3() {
+            const container = document.getElementById('excelContentHoja3');
+            
+            if (!filteredDataHoja3 || filteredDataHoja3.length === 0) {
+                container.innerHTML = '<div class="error">No se encontraron datos con los filtros aplicados</div>';
+                if (currentSheet === 'hoja3') {
+                    document.getElementById('stats').style.display = 'none';
+                    document.getElementById('pagination').innerHTML = '';
+                }
+                return;
+            }
+            
+            const rowsPerPageValue = rowsPerPage === 'all' ? filteredDataHoja3.length : rowsPerPage;
+            const startIndex = (currentPageHoja3 - 1) * rowsPerPageValue;
+            const endIndex = Math.min(startIndex + rowsPerPageValue, filteredDataHoja3.length);
+            const pageData = filteredDataHoja3.slice(startIndex, endIndex);
+            
+            let tableHTML = '<div class="excel-container"><table><thead><tr>';
+            
+            headersHoja3.forEach(header => {
+                const headerText = header && header.toString().trim() !== '' ? header : 'Columna';
+                tableHTML += `<th>${headerText}</th>`;
+            });
+            tableHTML += '</tr></thead><tbody>';
+            
+            pageData.forEach(row => {
+                tableHTML += '<tr>';
+                const rowData = [...row];
+                while (rowData.length < headersHoja3.length) {
+                    rowData.push('');
+                }
+                
+                rowData.forEach(cell => {
+                    const value = cell !== undefined && cell !== null ? cell : '';
+                    tableHTML += `<td>${value}</td>`;
+                });
+                tableHTML += '</tr>';
+            });
+            
+            tableHTML += '</tbody></table></div>';
+            
+            container.innerHTML = tableHTML;
+            
+            if (currentSheet === 'hoja3') {
+                document.getElementById('stats').style.display = 'flex';
+                updateStatsHoja3();
+                updatePaginationHoja3(rowsPerPageValue);
+            }
+        }
+
         function onProyectoChange() {
             const selectedProyecto = document.getElementById('filterProyecto').value;
             const selectComponente = document.getElementById('filterComponente');
             const selectActividad = document.getElementById('filterActividad');
             
-            // Actualizar componentes basado en el proyecto seleccionado
             if (selectedProyecto) {
-                // Filtrar componentes por proyecto
                 const componentesDelProyecto = proyectoComponentes.get(selectedProyecto) || new Set();
                 const componentesArray = Array.from(componentesDelProyecto).sort();
                 
@@ -680,9 +1082,8 @@
                 });
                 selectComponente.disabled = false;
             } else {
-                // Si no hay proyecto, mostrar todos los componentes
                 selectComponente.innerHTML = '<option value="">Todos los componentes</option>';
-                uniqueValues.componentes.forEach(value => {
+                uniqueValuesHoja1.componentes.forEach(value => {
                     const option = document.createElement('option');
                     option.value = value;
                     option.textContent = value;
@@ -691,7 +1092,6 @@
                 selectComponente.disabled = false;
             }
             
-            // Actualizar actividades basado en el nuevo componente (o resetear si no hay componente)
             const selectedComponente = selectComponente.value;
             updateActividadesFilter(selectedProyecto, selectedComponente);
         }
@@ -710,22 +1110,18 @@
             let actividadesArray = [];
             
             if (componente) {
-                // Si hay componente seleccionado, filtrar actividades por componente
                 const actividadesDelComponente = componenteActividades.get(componente) || new Set();
                 actividadesArray = Array.from(actividadesDelComponente).sort();
                 
-                // Si también hay proyecto, hacer intersección con actividades del proyecto
                 if (proyecto) {
                     const actividadesDelProyecto = proyectoActividades.get(proyecto) || new Set();
                     actividadesArray = actividadesArray.filter(act => actividadesDelProyecto.has(act));
                 }
             } else if (proyecto) {
-                // Si solo hay proyecto, filtrar actividades por proyecto
                 const actividadesDelProyecto = proyectoActividades.get(proyecto) || new Set();
                 actividadesArray = Array.from(actividadesDelProyecto).sort();
             } else {
-                // Si no hay filtros, mostrar todas las actividades
-                actividadesArray = uniqueValues.actividades;
+                actividadesArray = uniqueValuesHoja1.actividades;
             }
             
             selectActividad.innerHTML = '<option value="">Todas las actividades</option>';
@@ -740,30 +1136,36 @@
             });
         }
 
-        function applyFilters() {
+        function applyFilters(sheet) {
+            if (sheet === 'hoja1') {
+                applyFiltersHoja1();
+            } else {
+                applyFiltersHoja3();
+            }
+        }
+
+        function applyFiltersHoja1() {
             const proyectoFilter = document.getElementById('filterProyecto').value;
             const componenteFilter = document.getElementById('filterComponente').value;
             const actividadFilter = document.getElementById('filterActividad').value;
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+            const searchTerm = document.getElementById('searchInputHoja1').value.toLowerCase().trim();
             
-            filteredData = allData.filter(row => {
-                // Aplicar filtros específicos
-                if (proyectoFilter && columnIndices.proyecto !== -1) {
-                    const rowValue = row[columnIndices.proyecto] ? row[columnIndices.proyecto].toString() : '';
+            filteredDataHoja1 = allDataHoja1.filter(row => {
+                if (proyectoFilter && columnIndicesHoja1.proyecto !== -1) {
+                    const rowValue = row[columnIndicesHoja1.proyecto] ? row[columnIndicesHoja1.proyecto].toString() : '';
                     if (rowValue !== proyectoFilter) return false;
                 }
                 
-                if (componenteFilter && columnIndices.componente !== -1) {
-                    const rowValue = row[columnIndices.componente] ? row[columnIndices.componente].toString() : '';
+                if (componenteFilter && columnIndicesHoja1.componente !== -1) {
+                    const rowValue = row[columnIndicesHoja1.componente] ? row[columnIndicesHoja1.componente].toString() : '';
                     if (rowValue !== componenteFilter) return false;
                 }
                 
-                if (actividadFilter && columnIndices.actividad !== -1) {
-                    const rowValue = row[columnIndices.actividad] ? row[columnIndices.actividad].toString() : '';
+                if (actividadFilter && columnIndicesHoja1.actividad !== -1) {
+                    const rowValue = row[columnIndicesHoja1.actividad] ? row[columnIndicesHoja1.actividad].toString() : '';
                     if (rowValue !== actividadFilter) return false;
                 }
                 
-                // Aplicar búsqueda general
                 if (searchTerm) {
                     return row.some(cell => {
                         if (cell === null || cell === undefined) return false;
@@ -774,95 +1176,159 @@
                 return true;
             });
             
-            currentPage = 1;
-            displayData();
-            updateStats();
-        }
-
-        function clearFilters() {
-            document.getElementById('filterProyecto').value = '';
-            document.getElementById('filterComponente').innerHTML = '<option value="">Todos los componentes</option>';
-            document.getElementById('filterActividad').innerHTML = '<option value="">Todas las actividades</option>';
-            document.getElementById('searchInput').value = '';
-            
-            // Restaurar todos los filtros
-            uniqueValues.componentes.forEach(value => {
-                const option = document.createElement('option');
-                option.value = value;
-                option.textContent = value;
-                document.getElementById('filterComponente').appendChild(option);
-            });
-            
-            uniqueValues.actividades.forEach(value => {
-                const option = document.createElement('option');
-                option.value = value;
-                option.textContent = value;
-                document.getElementById('filterActividad').appendChild(option);
-            });
-            
-            filteredData = [...allData];
-            currentPage = 1;
-            displayData();
-            updateStats();
-        }
-
-        function displayData() {
-            const container = document.getElementById('excelContent');
-            
-            if (!filteredData || filteredData.length === 0) {
-                container.innerHTML = '<div class="error">No se encontraron datos con los filtros aplicados</div>';
-                document.getElementById('stats').style.display = 'none';
-                document.getElementById('pagination').innerHTML = '';
-                return;
+            currentPageHoja1 = 1;
+            if (currentSheet === 'hoja1') {
+                displayDataHoja1();
             }
+        }
+
+        function applyFiltersHoja3() {
+            const hcFilter = document.getElementById('filterHC').value;
+            const proyectoFilter = document.getElementById('filterProyecto3').value;
+            const actividadFilter = document.getElementById('filterActividad3').value;
+            const tipoFilter = document.getElementById('filterTipo').value;
+            const sucursalFilter = document.getElementById('filterSucursal').value;
+            const componenteFilter = document.getElementById('filterComponente3').value;
+            const searchTerm = document.getElementById('searchInputHoja3').value.toLowerCase().trim();
             
-            // Calcular paginación
-            const rowsPerPageValue = document.getElementById('rowsPerPage').value;
-            const rowsPerPage = rowsPerPageValue === 'all' ? filteredData.length : parseInt(rowsPerPageValue);
-            
-            const startIndex = (currentPage - 1) * rowsPerPage;
-            const endIndex = Math.min(startIndex + rowsPerPage, filteredData.length);
-            const pageData = filteredData.slice(startIndex, endIndex);
-            
-            // Crear tabla
-            let tableHTML = '<div class="excel-container"><table><thead><tr>';
-            
-            // Encabezados
-            headers.forEach(header => {
-                const headerText = header && header.toString().trim() !== '' ? header : 'Columna';
-                tableHTML += `<th>${headerText}</th>`;
-            });
-            tableHTML += '</tr></thead><tbody>';
-            
-            // Datos
-            pageData.forEach(row => {
-                tableHTML += '<tr>';
-                // Asegurar que todas las filas tengan el mismo número de columnas
-                const rowData = [...row];
-                while (rowData.length < headers.length) {
-                    rowData.push('');
+            filteredDataHoja3 = allDataHoja3.filter(row => {
+                if (hcFilter && columnIndicesHoja3.hc !== -1) {
+                    const rowValue = row[columnIndicesHoja3.hc] ? row[columnIndicesHoja3.hc].toString() : '';
+                    if (rowValue !== hcFilter) return false;
                 }
                 
-                rowData.forEach(cell => {
-                    const value = cell !== undefined && cell !== null ? cell : '';
-                    tableHTML += `<td>${value}</td>`;
-                });
-                tableHTML += '</tr>';
+                if (proyectoFilter && columnIndicesHoja3.proyecto !== -1) {
+                    const rowValue = row[columnIndicesHoja3.proyecto] ? row[columnIndicesHoja3.proyecto].toString() : '';
+                    if (rowValue !== proyectoFilter) return false;
+                }
+                
+                if (actividadFilter && columnIndicesHoja3.actividad !== -1) {
+                    const rowValue = row[columnIndicesHoja3.actividad] ? row[columnIndicesHoja3.actividad].toString() : '';
+                    if (rowValue !== actividadFilter) return false;
+                }
+                
+                if (tipoFilter && columnIndicesHoja3.tipo !== -1) {
+                    const rowValue = row[columnIndicesHoja3.tipo] ? row[columnIndicesHoja3.tipo].toString() : '';
+                    if (rowValue !== tipoFilter) return false;
+                }
+                
+                if (sucursalFilter && columnIndicesHoja3.sucursal !== -1) {
+                    const rowValue = row[columnIndicesHoja3.sucursal] ? row[columnIndicesHoja3.sucursal].toString() : '';
+                    if (rowValue !== sucursalFilter) return false;
+                }
+                
+                if (componenteFilter && columnIndicesHoja3.componente !== -1) {
+                    const rowValue = row[columnIndicesHoja3.componente] ? row[columnIndicesHoja3.componente].toString() : '';
+                    if (rowValue !== componenteFilter) return false;
+                }
+                
+                if (searchTerm) {
+                    return row.some(cell => {
+                        if (cell === null || cell === undefined) return false;
+                        return cell.toString().toLowerCase().includes(searchTerm);
+                    });
+                }
+                
+                return true;
             });
             
-            tableHTML += '</tbody></table></div>';
-            
-            container.innerHTML = tableHTML;
-            
-            // Mostrar estadísticas
-            document.getElementById('stats').style.display = 'flex';
-            
-            // Actualizar paginación
-            updatePagination(rowsPerPage);
+            currentPageHoja3 = 1;
+            if (currentSheet === 'hoja3') {
+                displayDataHoja3();
+            }
         }
 
-        function updatePagination(rowsPerPage) {
-            const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+        function clearFilters(sheet) {
+            if (sheet === 'hoja1') {
+                document.getElementById('filterProyecto').value = '';
+                document.getElementById('filterComponente').innerHTML = '<option value="">Todos los componentes</option>';
+                document.getElementById('filterActividad').innerHTML = '<option value="">Todas las actividades</option>';
+                document.getElementById('searchInputHoja1').value = '';
+                
+                uniqueValuesHoja1.componentes.forEach(value => {
+                    const option = document.createElement('option');
+                    option.value = value;
+                    option.textContent = value;
+                    document.getElementById('filterComponente').appendChild(option);
+                });
+                
+                uniqueValuesHoja1.actividades.forEach(value => {
+                    const option = document.createElement('option');
+                    option.value = value;
+                    option.textContent = value;
+                    document.getElementById('filterActividad').appendChild(option);
+                });
+                
+                filteredDataHoja1 = [...allDataHoja1];
+                currentPageHoja1 = 1;
+                if (currentSheet === 'hoja1') {
+                    displayDataHoja1();
+                }
+            } else {
+                document.getElementById('filterHC').value = '';
+                document.getElementById('filterProyecto3').value = '';
+                document.getElementById('filterActividad3').value = '';
+                document.getElementById('filterTipo').value = '';
+                document.getElementById('filterSucursal').value = '';
+                document.getElementById('filterComponente3').value = '';
+                document.getElementById('searchInputHoja3').value = '';
+                
+                filteredDataHoja3 = [...allDataHoja3];
+                currentPageHoja3 = 1;
+                if (currentSheet === 'hoja3') {
+                    displayDataHoja3();
+                }
+            }
+        }
+
+        function updateStatsHoja1() {
+            document.getElementById('rowCount').textContent = `${filteredDataHoja1.length} de ${allDataHoja1.length}`;
+            document.getElementById('columnCount').textContent = headersHoja1.length;
+            document.getElementById('exportCount').textContent = `Exportando: ${filteredDataHoja1.length} registros`;
+            
+            const proyectoFilter = document.getElementById('filterProyecto').value;
+            const componenteFilter = document.getElementById('filterComponente').value;
+            const actividadFilter = document.getElementById('filterActividad').value;
+            const searchTerm = document.getElementById('searchInputHoja1').value;
+            
+            const activeFilters = [];
+            if (proyectoFilter) activeFilters.push('Proyecto');
+            if (componenteFilter) activeFilters.push('Componente');
+            if (actividadFilter) activeFilters.push('Actividad');
+            if (searchTerm) activeFilters.push('Búsqueda');
+            
+            document.getElementById('filterStatus').textContent = activeFilters.length > 0 ? 
+                activeFilters.join(', ') : 'Sin filtros';
+        }
+
+        function updateStatsHoja3() {
+            document.getElementById('rowCount').textContent = `${filteredDataHoja3.length} de ${allDataHoja3.length}`;
+            document.getElementById('columnCount').textContent = headersHoja3.length;
+            document.getElementById('exportCount').textContent = `Exportando: ${filteredDataHoja3.length} registros`;
+            
+            const hcFilter = document.getElementById('filterHC').value;
+            const proyectoFilter = document.getElementById('filterProyecto3').value;
+            const actividadFilter = document.getElementById('filterActividad3').value;
+            const tipoFilter = document.getElementById('filterTipo').value;
+            const sucursalFilter = document.getElementById('filterSucursal').value;
+            const componenteFilter = document.getElementById('filterComponente3').value;
+            const searchTerm = document.getElementById('searchInputHoja3').value;
+            
+            const activeFilters = [];
+            if (hcFilter) activeFilters.push('HC');
+            if (proyectoFilter) activeFilters.push('Proyecto');
+            if (actividadFilter) activeFilters.push('Actividad');
+            if (tipoFilter) activeFilters.push('Tipo');
+            if (sucursalFilter) activeFilters.push('Sucursal');
+            if (componenteFilter) activeFilters.push('Componente');
+            if (searchTerm) activeFilters.push('Búsqueda');
+            
+            document.getElementById('filterStatus').textContent = activeFilters.length > 0 ? 
+                activeFilters.join(', ') : 'Sin filtros';
+        }
+
+        function updatePaginationHoja1(rowsPerPage) {
+            const totalPages = Math.ceil(filteredDataHoja1.length / rowsPerPage);
             const paginationDiv = document.getElementById('pagination');
             
             if (totalPages <= 1) {
@@ -872,12 +1338,10 @@
             
             let paginationHTML = '';
             
-            // Botón anterior
-            paginationHTML += `<button class="page-btn" onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>Anterior</button>`;
+            paginationHTML += `<button class="page-btn" onclick="changePage(${currentPageHoja1 - 1})" ${currentPageHoja1 === 1 ? 'disabled' : ''}>Anterior</button>`;
             
-            // Números de página
             const maxButtons = 5;
-            let startPage = Math.max(1, currentPage - Math.floor(maxButtons / 2));
+            let startPage = Math.max(1, currentPageHoja1 - Math.floor(maxButtons / 2));
             let endPage = Math.min(totalPages, startPage + maxButtons - 1);
             
             if (endPage - startPage + 1 < maxButtons) {
@@ -892,7 +1356,7 @@
             }
             
             for (let i = startPage; i <= endPage; i++) {
-                paginationHTML += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">${i}</button>`;
+                paginationHTML += `<button class="page-btn ${i === currentPageHoja1 ? 'active' : ''}" onclick="changePage(${i})">${i}</button>`;
             }
             
             if (endPage < totalPages) {
@@ -902,80 +1366,116 @@
                 paginationHTML += `<button class="page-btn" onclick="changePage(${totalPages})">${totalPages}</button>`;
             }
             
-            // Botón siguiente
-            paginationHTML += `<button class="page-btn" onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>Siguiente</button>`;
+            paginationHTML += `<button class="page-btn" onclick="changePage(${currentPageHoja1 + 1})" ${currentPageHoja1 === totalPages ? 'disabled' : ''}>Siguiente</button>`;
+            
+            paginationDiv.innerHTML = paginationHTML;
+        }
+
+        function updatePaginationHoja3(rowsPerPage) {
+            const totalPages = Math.ceil(filteredDataHoja3.length / rowsPerPage);
+            const paginationDiv = document.getElementById('pagination');
+            
+            if (totalPages <= 1) {
+                paginationDiv.innerHTML = '';
+                return;
+            }
+            
+            let paginationHTML = '';
+            
+            paginationHTML += `<button class="page-btn" onclick="changePage(${currentPageHoja3 - 1})" ${currentPageHoja3 === 1 ? 'disabled' : ''}>Anterior</button>`;
+            
+            const maxButtons = 5;
+            let startPage = Math.max(1, currentPageHoja3 - Math.floor(maxButtons / 2));
+            let endPage = Math.min(totalPages, startPage + maxButtons - 1);
+            
+            if (endPage - startPage + 1 < maxButtons) {
+                startPage = Math.max(1, endPage - maxButtons + 1);
+            }
+            
+            if (startPage > 1) {
+                paginationHTML += `<button class="page-btn" onclick="changePage(1)">1</button>`;
+                if (startPage > 2) {
+                    paginationHTML += `<span class="page-btn" style="border: none; background: none;">...</span>`;
+                }
+            }
+            
+            for (let i = startPage; i <= endPage; i++) {
+                paginationHTML += `<button class="page-btn ${i === currentPageHoja3 ? 'active' : ''}" onclick="changePage(${i})">${i}</button>`;
+            }
+            
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) {
+                    paginationHTML += `<span class="page-btn" style="border: none; background: none;">...</span>`;
+                }
+                paginationHTML += `<button class="page-btn" onclick="changePage(${totalPages})">${totalPages}</button>`;
+            }
+            
+            paginationHTML += `<button class="page-btn" onclick="changePage(${currentPageHoja3 + 1})" ${currentPageHoja3 === totalPages ? 'disabled' : ''}>Siguiente</button>`;
             
             paginationDiv.innerHTML = paginationHTML;
         }
 
         function changePage(page) {
-            currentPage = page;
-            displayData();
+            if (currentSheet === 'hoja1') {
+                currentPageHoja1 = page;
+                displayDataHoja1();
+            } else {
+                currentPageHoja3 = page;
+                displayDataHoja3();
+            }
         }
 
         function changeRowsPerPage() {
-            currentPage = 1;
-            displayData();
-        }
-
-        function updateStats() {
-            document.getElementById('rowCount').textContent = `${filteredData.length} de ${allData.length}`;
-            document.getElementById('columnCount').textContent = headers.length;
-            document.getElementById('exportCount').textContent = `Exportando: ${filteredData.length} registros`;
+            const select = document.getElementById('rowsPerPage');
+            rowsPerPage = select.value === 'all' ? 'all' : parseInt(select.value);
             
-            // Actualizar estado de filtros
-            const proyectoFilter = document.getElementById('filterProyecto').value;
-            const componenteFilter = document.getElementById('filterComponente').value;
-            const actividadFilter = document.getElementById('filterActividad').value;
-            const searchTerm = document.getElementById('searchInput').value;
-            
-            const activeFilters = [];
-            if (proyectoFilter) activeFilters.push('Proyecto');
-            if (componenteFilter) activeFilters.push('Componente');
-            if (actividadFilter) activeFilters.push('Actividad');
-            if (searchTerm) activeFilters.push('Búsqueda');
-            
-            document.getElementById('filterStatus').textContent = activeFilters.length > 0 ? 
-                activeFilters.join(', ') : 'Sin filtros';
+            if (currentSheet === 'hoja1') {
+                currentPageHoja1 = 1;
+                displayDataHoja1();
+            } else {
+                currentPageHoja3 = 1;
+                displayDataHoja3();
+            }
         }
 
         function showError(message) {
-            const container = document.getElementById('excelContent');
-            container.innerHTML = `<div class="error">${message}</div>`;
+            const container1 = document.getElementById('excelContentHoja1');
+            const container3 = document.getElementById('excelContentHoja3');
+            container1.innerHTML = `<div class="error">${message}</div>`;
+            container3.innerHTML = `<div class="error">${message}</div>`;
             document.getElementById('stats').style.display = 'none';
             document.getElementById('pagination').innerHTML = '';
         }
 
-        // Evento de búsqueda con debounce
-        let searchTimeout;
-        document.getElementById('searchInput').addEventListener('input', function(e) {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => {
-                applyFilters();
-            }, 300);
-        });
-
-        // Función para exportar a Excel
         function exportToExcel() {
-            if (filteredData.length === 0) {
+            let dataToExport;
+            let sheetName;
+            
+            if (currentSheet === 'hoja1') {
+                dataToExport = filteredDataHoja1;
+                sheetName = 'Hoja1';
+            } else {
+                dataToExport = filteredDataHoja3;
+                sheetName = 'Hoja3';
+            }
+            
+            if (dataToExport.length === 0) {
                 alert('No hay datos para exportar');
                 return;
             }
             
             try {
-                // Preparar los datos para exportar
+                const headers = currentSheet === 'hoja1' ? headersHoja1 : headersHoja3;
                 const exportHeaders = headers.map(h => h || 'Columna');
-                const exportData = [exportHeaders, ...filteredData];
+                const exportData = [exportHeaders, ...dataToExport];
                 
-                // Crear una nueva hoja de trabajo
                 const wb = XLSX.utils.book_new();
                 const ws = XLSX.utils.aoa_to_sheet(exportData);
                 
-                // Ajustar el ancho de las columnas
                 const colWidths = [];
                 headers.forEach((header, index) => {
                     let maxLength = header ? header.toString().length : 10;
-                    filteredData.forEach(row => {
+                    dataToExport.forEach(row => {
                         if (row[index] !== undefined && row[index] !== null) {
                             maxLength = Math.max(maxLength, row[index].toString().length);
                         }
@@ -984,30 +1484,44 @@
                 });
                 ws['!cols'] = colWidths;
                 
-                // Agregar la hoja al libro
-                XLSX.utils.book_append_sheet(wb, ws, 'Hoja1');
+                XLSX.utils.book_append_sheet(wb, ws, sheetName);
                 
-                // Generar nombre del archivo
                 const now = new Date();
                 const dateStr = `${now.getFullYear()}${(now.getMonth()+1).toString().padStart(2,'0')}${now.getDate().toString().padStart(2,'0')}_${now.getHours().toString().padStart(2,'0')}${now.getMinutes().toString().padStart(2,'0')}`;
                 
-                let exportType = 'todos';
-                if (filteredData.length < allData.length) {
-                    exportType = 'filtrados';
-                }
+                const fileName = `Actividades_Alistamiento_Bogota_${sheetName}_${dateStr}.xlsx`;
                 
-                const fileName = `Actividades_Alistamiento_Bogota_${exportType}_${dateStr}.xlsx`;
-                
-                // Exportar el archivo
                 XLSX.writeFile(wb, fileName);
                 
-                alert(`Archivo Excel generado exitosamente con ${filteredData.length} registros`);
+                alert(`Archivo Excel generado exitosamente con ${dataToExport.length} registros`);
                 
             } catch (error) {
                 console.error('Error al exportar:', error);
                 alert('Error al generar el archivo Excel. Por favor intente nuevamente.');
             }
         }
+
+        // Eventos de búsqueda con debounce
+        let searchTimeoutHoja1;
+        let searchTimeoutHoja3;
+        
+        document.getElementById('searchInputHoja1').addEventListener('input', function(e) {
+            clearTimeout(searchTimeoutHoja1);
+            searchTimeoutHoja1 = setTimeout(() => {
+                if (currentSheet === 'hoja1') {
+                    applyFiltersHoja1();
+                }
+            }, 300);
+        });
+        
+        document.getElementById('searchInputHoja3').addEventListener('input', function(e) {
+            clearTimeout(searchTimeoutHoja3);
+            searchTimeoutHoja3 = setTimeout(() => {
+                if (currentSheet === 'hoja3') {
+                    applyFiltersHoja3();
+                }
+            }, 300);
+        });
 
         // Iniciar carga
         window.addEventListener('load', loadExcel);
